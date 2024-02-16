@@ -15,8 +15,30 @@
         }
       },
       "LD.InfoSec.Network.DoS/1.0.0": {
+        "dependencies": {
+          "LD.InfoSec.Network.Linux": "1.0.0",
+          "LD.InfoSec.Network.Win": "1.0.0"
+        },
         "runtime": {
           "LD.InfoSec.Network.DoS.dll": {}
+        }
+      },
+      "LD.InfoSec.Network.Linux/1.0.0": {
+        "dependencies": {
+          "LD.InfoSec.Network.Shared": "1.0.0"
+        },
+        "runtime": {
+          "LD.InfoSec.Network.Linux.dll": {}
+        }
+      },
+      "LD.InfoSec.Network.Shared/1.0.0": {
+        "runtime": {
+          "LD.InfoSec.Network.Shared.dll": {}
+        }
+      },
+      "LD.InfoSec.Network.Win/1.0.0": {
+        "runtime": {
+          "LD.InfoSec.Network.Win.dll": {}
         }
       }
     }
@@ -28,6 +50,21 @@
       "sha512": ""
     },
     "LD.InfoSec.Network.DoS/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LD.InfoSec.Network.Linux/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LD.InfoSec.Network.Shared/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LD.InfoSec.Network.Win/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

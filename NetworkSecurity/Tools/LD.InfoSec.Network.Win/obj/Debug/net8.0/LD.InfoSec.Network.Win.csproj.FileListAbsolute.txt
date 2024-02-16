@@ -1,0 +1,12 @@
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Win\bin\Debug\net8.0\LD.InfoSec.Network.Win.deps.json
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Win\bin\Debug\net8.0\LD.InfoSec.Network.Win.dll
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Win\bin\Debug\net8.0\LD.InfoSec.Network.Win.pdb
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Win\obj\Debug\net8.0\LD.InfoSec.Network.Win.GeneratedMSBuildEditorConfig.editorconfig
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Win\obj\Debug\net8.0\LD.InfoSec.Network.Win.AssemblyInfoInputs.cache
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Win\obj\Debug\net8.0\LD.InfoSec.Network.Win.AssemblyInfo.cs
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Win\obj\Debug\net8.0\LD.InfoSec.Network.Win.csproj.CoreCompileInputs.cache
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Win\obj\Debug\net8.0\LD.InfoSec.Network.Win.sourcelink.json
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Win\obj\Debug\net8.0\LD.InfoSec.Network.Win.dll
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Win\obj\Debug\net8.0\refint\LD.InfoSec.Network.Win.dll
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Win\obj\Debug\net8.0\LD.InfoSec.Network.Win.pdb
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Win\obj\Debug\net8.0\ref\LD.InfoSec.Network.Win.dll

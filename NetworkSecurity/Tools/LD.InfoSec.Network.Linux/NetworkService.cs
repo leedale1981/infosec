@@ -1,0 +1,22 @@
+﻿using System.Net;
+using System.Net.Sockets;
+
+namespace LD.InfoSec.Network.Linux;
+
+public static class NetworkService
+{
+    public static async Task SendSynPackets(string targetIp, int targetPort, string sourceIp, int sourcePort, int packetCount)
+    {
+        using Socket socket = new(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.Raw);
+        IPAddress sourceIpAddress = IPAddress.Parse(sourceIp);
+        IPAddress targetIpAddress = IPAddress.Parse(targetIp);
+        IPEndPoint ipEndPoint = new(targetIpAddress, targetPort);
+        
+        byte[] packetBytes = Shared.NetworkService.GetRawIpWrapper(sourceIpAddress, targetIpAddress, targetPort, sourcePort);
+        
+        for (int index = 0; index < packetCount; index++)
+        {
+            await socket.SendToAsync(new ArraySegment<byte>(packetBytes), ipEndPoint);
+        }
+    }
+}

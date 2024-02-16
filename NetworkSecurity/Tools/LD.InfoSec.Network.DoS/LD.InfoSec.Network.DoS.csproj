@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\LD.InfoSec.Network.Linux\LD.InfoSec.Network.Linux.csproj" />
+    <ProjectReference Include="..\LD.InfoSec.Network.Win\LD.InfoSec.Network.Win.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -4,6 +4,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LD.InfoSec.Network.DoS", "L
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LD.InfoSec.Network.Cli", "LD.InfoSec.Network.Cli\LD.InfoSec.Network.Cli.csproj", "{2153DC30-2B0B-4B41-A2F9-180CB858B33E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LD.InfoSec.Network.Win", "LD.InfoSec.Network.Win\LD.InfoSec.Network.Win.csproj", "{EBD60A97-6055-443F-BCF4-1066169BF041}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LD.InfoSec.Network.Linux", "LD.InfoSec.Network.Linux\LD.InfoSec.Network.Linux.csproj", "{ADC32ED7-15DB-43A9-B661-4714B644FFF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LD.InfoSec.Network.Shared", "LD.InfoSec.Network.Shared\LD.InfoSec.Network.Shared.csproj", "{6C7FF6B8-DB41-4A85-9A57-8F49C21E12AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +24,17 @@ Global
 		{2153DC30-2B0B-4B41-A2F9-180CB858B33E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2153DC30-2B0B-4B41-A2F9-180CB858B33E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2153DC30-2B0B-4B41-A2F9-180CB858B33E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBD60A97-6055-443F-BCF4-1066169BF041}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBD60A97-6055-443F-BCF4-1066169BF041}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBD60A97-6055-443F-BCF4-1066169BF041}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBD60A97-6055-443F-BCF4-1066169BF041}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADC32ED7-15DB-43A9-B661-4714B644FFF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADC32ED7-15DB-43A9-B661-4714B644FFF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADC32ED7-15DB-43A9-B661-4714B644FFF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADC32ED7-15DB-43A9-B661-4714B644FFF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C7FF6B8-DB41-4A85-9A57-8F49C21E12AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C7FF6B8-DB41-4A85-9A57-8F49C21E12AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C7FF6B8-DB41-4A85-9A57-8F49C21E12AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C7FF6B8-DB41-4A85-9A57-8F49C21E12AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

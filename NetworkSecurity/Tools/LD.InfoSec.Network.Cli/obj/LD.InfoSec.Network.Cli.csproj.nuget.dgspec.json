@@ -102,6 +102,206 @@
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
+            "projectReferences": {
+              "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Linux\\LD.InfoSec.Network.Linux.csproj": {
+                "projectPath": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Linux\\LD.InfoSec.Network.Linux.csproj"
+              },
+              "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Win\\LD.InfoSec.Network.Win.csproj": {
+                "projectPath": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Win\\LD.InfoSec.Network.Win.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.102/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Linux\\LD.InfoSec.Network.Linux.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Linux\\LD.InfoSec.Network.Linux.csproj",
+        "projectName": "LD.InfoSec.Network.Linux",
+        "projectPath": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Linux\\LD.InfoSec.Network.Linux.csproj",
+        "packagesPath": "C:\\Users\\leedale1981\\.nuget\\packages\\",
+        "outputPath": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Linux\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "D:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\leedale1981\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Shared\\LD.InfoSec.Network.Shared.csproj": {
+                "projectPath": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Shared\\LD.InfoSec.Network.Shared.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.102/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Shared\\LD.InfoSec.Network.Shared.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Shared\\LD.InfoSec.Network.Shared.csproj",
+        "projectName": "LD.InfoSec.Network.Shared",
+        "projectPath": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Shared\\LD.InfoSec.Network.Shared.csproj",
+        "packagesPath": "C:\\Users\\leedale1981\\.nuget\\packages\\",
+        "outputPath": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Shared\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "D:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\leedale1981\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.102/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Win\\LD.InfoSec.Network.Win.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Win\\LD.InfoSec.Network.Win.csproj",
+        "projectName": "LD.InfoSec.Network.Win",
+        "projectPath": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Win\\LD.InfoSec.Network.Win.csproj",
+        "packagesPath": "C:\\Users\\leedale1981\\.nuget\\packages\\",
+        "outputPath": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Win\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "D:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\leedale1981\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
             "projectReferences": {}
           }
         },

@@ -5,11 +5,48 @@
       "LD.InfoSec.Network.DoS/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "LD.InfoSec.Network.Linux": "1.0.0",
+          "LD.InfoSec.Network.Win": "1.0.0"
+        },
         "compile": {
           "bin/placeholder/LD.InfoSec.Network.DoS.dll": {}
         },
         "runtime": {
           "bin/placeholder/LD.InfoSec.Network.DoS.dll": {}
+        }
+      },
+      "LD.InfoSec.Network.Linux/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "LD.InfoSec.Network.Shared": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/LD.InfoSec.Network.Linux.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/LD.InfoSec.Network.Linux.dll": {}
+        }
+      },
+      "LD.InfoSec.Network.Shared/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/LD.InfoSec.Network.Shared.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/LD.InfoSec.Network.Shared.dll": {}
+        }
+      },
+      "LD.InfoSec.Network.Win/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/LD.InfoSec.Network.Win.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/LD.InfoSec.Network.Win.dll": {}
         }
       }
     }
@@ -19,6 +56,21 @@
       "type": "project",
       "path": "../LD.InfoSec.Network.DoS/LD.InfoSec.Network.DoS.csproj",
       "msbuildProject": "../LD.InfoSec.Network.DoS/LD.InfoSec.Network.DoS.csproj"
+    },
+    "LD.InfoSec.Network.Linux/1.0.0": {
+      "type": "project",
+      "path": "../LD.InfoSec.Network.Linux/LD.InfoSec.Network.Linux.csproj",
+      "msbuildProject": "../LD.InfoSec.Network.Linux/LD.InfoSec.Network.Linux.csproj"
+    },
+    "LD.InfoSec.Network.Shared/1.0.0": {
+      "type": "project",
+      "path": "../LD.InfoSec.Network.Shared/LD.InfoSec.Network.Shared.csproj",
+      "msbuildProject": "../LD.InfoSec.Network.Shared/LD.InfoSec.Network.Shared.csproj"
+    },
+    "LD.InfoSec.Network.Win/1.0.0": {
+      "type": "project",
+      "path": "../LD.InfoSec.Network.Win/LD.InfoSec.Network.Win.csproj",
+      "msbuildProject": "../LD.InfoSec.Network.Win/LD.InfoSec.Network.Win.csproj"
     }
   },
   "projectFileDependencyGroups": {

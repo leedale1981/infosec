@@ -17,3 +17,9 @@ D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Cli\bin\Debug\net8.0\LD.
 D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Cli\bin\Debug\net8.0\LD.InfoSec.Network.DoS.pdb
 D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Cli\obj\Debug\net8.0\LD.InfoSec.Network.Cli.csproj.AssemblyReference.cache
 D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Cli\obj\Debug\net8.0\LD.InfoSec.Network.Cli.csproj.CopyComplete
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Cli\bin\Debug\net8.0\LD.InfoSec.Network.Linux.dll
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Cli\bin\Debug\net8.0\LD.InfoSec.Network.Shared.dll
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Cli\bin\Debug\net8.0\LD.InfoSec.Network.Win.dll
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Cli\bin\Debug\net8.0\LD.InfoSec.Network.Linux.pdb
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Cli\bin\Debug\net8.0\LD.InfoSec.Network.Shared.pdb
+D:\src\infosec\NetworkSecurity\Tools\LD.InfoSec.Network.Cli\bin\Debug\net8.0\LD.InfoSec.Network.Win.pdb
