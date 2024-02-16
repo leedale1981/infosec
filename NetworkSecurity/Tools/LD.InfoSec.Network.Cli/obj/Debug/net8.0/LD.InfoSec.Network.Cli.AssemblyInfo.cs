@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LD.InfoSec.Network.Cli")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2dff2502344ea8bb5add6a8ecf7675930ce2119f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8617c076526b687e4629d81cab627a5a745f7292")]
 [assembly: System.Reflection.AssemblyProductAttribute("LD.InfoSec.Network.Cli")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LD.InfoSec.Network.Cli")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
