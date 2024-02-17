@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LD.InfoSec.Network.Linux", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LD.InfoSec.Network.Shared", "LD.InfoSec.Network.Shared\LD.InfoSec.Network.Shared.csproj", "{6C7FF6B8-DB41-4A85-9A57-8F49C21E12AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LD.InfoSec.Network.Discovery", "LD.InfoSec.Network.Discovery\LD.InfoSec.Network.Discovery.csproj", "{55A598E9-6439-4DB9-B1C3-CD2515AD54AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{6C7FF6B8-DB41-4A85-9A57-8F49C21E12AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C7FF6B8-DB41-4A85-9A57-8F49C21E12AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C7FF6B8-DB41-4A85-9A57-8F49C21E12AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55A598E9-6439-4DB9-B1C3-CD2515AD54AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55A598E9-6439-4DB9-B1C3-CD2515AD54AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55A598E9-6439-4DB9-B1C3-CD2515AD54AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55A598E9-6439-4DB9-B1C3-CD2515AD54AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
