@@ -2,7 +2,7 @@
 
 namespace LD.InfoSec.Network.Shared;
 
-public static class NetworkService
+public static class PacketGenerator
 {
     public static byte[] GetTcpSynPacketBytes(int targetPort, int sourcePort)
     {
