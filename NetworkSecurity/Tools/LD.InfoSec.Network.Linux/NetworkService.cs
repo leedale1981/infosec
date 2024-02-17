@@ -12,7 +12,7 @@ public static class NetworkService
         IPAddress targetIpAddress = IPAddress.Parse(targetIp);
         IPEndPoint ipEndPoint = new(targetIpAddress, targetPort);
         
-        byte[] packetBytes = Shared.NetworkService.GetRawIpWrapper(sourceIpAddress, targetIpAddress, targetPort, sourcePort);
+        byte[] packetBytes = Shared.PacketGenerator.GetRawIpWrapper(sourceIpAddress, targetIpAddress, targetPort, sourcePort);
         
         for (int index = 0; index < packetCount; index++)
         {
