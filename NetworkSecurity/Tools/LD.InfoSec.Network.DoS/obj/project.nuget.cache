@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xnmQbpCL9nV9huCFa6LItAI3BldPy0aquQFN1/ypHVRc7k6jX5NCzL/s0QAhmCtbJgm83+nJ75bBvkK/bO44Mw==",
+  "dgSpecHash": "3QahARzfqiz4Bw4lHj1anGVbr5WLLFDeVhfgfN6kKGxE6ypDsHxOWqBKzRg38Oe8k9uK8MxaLnSJaj5+PE8SyQ==",
   "success": true,
-  "projectFilePath": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.DoS\\LD.InfoSec.Network.DoS.csproj",
+  "projectFilePath": "/home/kali/src/infosec/NetworkSecurity/Tools/LD.InfoSec.Network.DoS/LD.InfoSec.Network.DoS.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

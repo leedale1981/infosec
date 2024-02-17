@@ -4,7 +4,7 @@ namespace LD.InfoSec.Network.Shared;
 
 public static class NetworkService
 {
-    public static byte[] GetTcpSynPacketBytes(int targetPort, int sourcePort)
+    public static byte[] GetTcpSynPacketBytes(ushort targetPort, ushort sourcePort)
     {
         MemoryStream stream = new();
         
@@ -47,20 +47,18 @@ public static class NetworkService
         return stream.ToArray();
     }
     
-    public static byte[] GetRawIpWrapper(IPAddress sourceIpAddress, IPAddress targetIpAddress, int targetPort, int sourcePort)
+    public static byte[] GetRawIpWrapper(IPAddress sourceIpAddress, IPAddress targetIpAddress, ushort targetPort, ushort sourcePort)
     {
-        byte[] ethernetBytes = ConvertHexToByteArray("00155d04f80700155dca2d2b0800");
         byte[] ipHeaderBytes = ConvertHexToByteArray("4500002c2680000034067ecc");
         byte[] sourceIpBytes = sourceIpAddress.GetAddressBytes();
         byte[] targetIpBytes = targetIpAddress.GetAddressBytes();
         
         byte[] tcpSynPacketBytes = GetTcpSynPacketBytes(targetPort, sourcePort);
-        byte[] packetBytes = new byte[ipHeaderBytes.Length + tcpSynPacketBytes.Length + sourceIpBytes.Length + targetIpBytes.Length + ethernetBytes.Length];
-        ethernetBytes.CopyTo(packetBytes, 0);
-        ipHeaderBytes.CopyTo(packetBytes, ethernetBytes.Length);
-        sourceIpBytes.CopyTo(packetBytes, ipHeaderBytes.Length + ethernetBytes.Length);
-        targetIpBytes.CopyTo(packetBytes, ipHeaderBytes.Length + sourceIpBytes.Length + ethernetBytes.Length);
-        tcpSynPacketBytes.CopyTo(packetBytes, ipHeaderBytes.Length + sourceIpBytes.Length + targetIpBytes.Length + ethernetBytes.Length);
+        byte[] packetBytes = new byte[ipHeaderBytes.Length + tcpSynPacketBytes.Length + sourceIpBytes.Length + targetIpBytes.Length];
+        ipHeaderBytes.CopyTo(packetBytes, 0);
+        sourceIpBytes.CopyTo(packetBytes, ipHeaderBytes.Length);
+        targetIpBytes.CopyTo(packetBytes, ipHeaderBytes.Length + sourceIpBytes.Length);
+        tcpSynPacketBytes.CopyTo(packetBytes, ipHeaderBytes.Length + sourceIpBytes.Length + targetIpBytes.Length);
         return packetBytes;
     }
     

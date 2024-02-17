@@ -61,48 +61,35 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\leedale1981\\.nuget\\packages\\": {},
-    "D:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "/root/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.DoS\\LD.InfoSec.Network.DoS.csproj",
+      "projectUniqueName": "/home/kali/src/infosec/NetworkSecurity/Tools/LD.InfoSec.Network.DoS/LD.InfoSec.Network.DoS.csproj",
       "projectName": "LD.InfoSec.Network.DoS",
-      "projectPath": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.DoS\\LD.InfoSec.Network.DoS.csproj",
-      "packagesPath": "C:\\Users\\leedale1981\\.nuget\\packages\\",
-      "outputPath": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.DoS\\obj\\",
+      "projectPath": "/home/kali/src/infosec/NetworkSecurity/Tools/LD.InfoSec.Network.DoS/LD.InfoSec.Network.DoS.csproj",
+      "packagesPath": "/root/.nuget/packages/",
+      "outputPath": "/home/kali/src/infosec/NetworkSecurity/Tools/LD.InfoSec.Network.DoS/obj/",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "D:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet",
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\leedale1981\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        "/root/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Linux\\LD.InfoSec.Network.Linux.csproj": {
-              "projectPath": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Linux\\LD.InfoSec.Network.Linux.csproj"
+            "/home/kali/src/infosec/NetworkSecurity/Tools/LD.InfoSec.Network.Linux/LD.InfoSec.Network.Linux.csproj": {
+              "projectPath": "/home/kali/src/infosec/NetworkSecurity/Tools/LD.InfoSec.Network.Linux/LD.InfoSec.Network.Linux.csproj"
             },
-            "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Win\\LD.InfoSec.Network.Win.csproj": {
-              "projectPath": "D:\\src\\infosec\\NetworkSecurity\\Tools\\LD.InfoSec.Network.Win\\LD.InfoSec.Network.Win.csproj"
+            "/home/kali/src/infosec/NetworkSecurity/Tools/LD.InfoSec.Network.Win/LD.InfoSec.Network.Win.csproj": {
+              "projectPath": "/home/kali/src/infosec/NetworkSecurity/Tools/LD.InfoSec.Network.Win/LD.InfoSec.Network.Win.csproj"
             }
           }
         }
@@ -111,6 +98,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -132,7 +124,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.102/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/home/kali/.dotnet/sdk/8.0.201/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

@@ -5,7 +5,7 @@ namespace LD.InfoSec.Network.Linux;
 
 public static class NetworkService
 {
-    public static async Task SendSynPackets(string targetIp, int targetPort, string sourceIp, int sourcePort, int packetCount)
+    public static async Task SendSynPackets(string targetIp, ushort targetPort, string sourceIp, ushort sourcePort, int packetCount)
     {
         using Socket socket = new(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.Raw);
         IPAddress sourceIpAddress = IPAddress.Parse(sourceIp);

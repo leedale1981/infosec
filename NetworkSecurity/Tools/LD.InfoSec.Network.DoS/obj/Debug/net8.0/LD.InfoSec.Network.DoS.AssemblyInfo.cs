@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LD.InfoSec.Network.DoS")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+174ee0bde2e94895bc3f33ae5b36aab7a3dd759d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7b8f194f7ef72a59588f48c2f7a6495481414fad")]
 [assembly: System.Reflection.AssemblyProductAttribute("LD.InfoSec.Network.DoS")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LD.InfoSec.Network.DoS")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
