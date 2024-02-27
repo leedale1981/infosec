@@ -1,8 +1,4 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using System.Runtime.InteropServices.JavaScript;
-
-namespace LD.InfoSec.Network.DoS;
+﻿namespace LD.InfoSec.Network.DoS;
 
 public class DosAttack(AttackOptions options)
 {
@@ -20,7 +16,7 @@ public class DosAttack(AttackOptions options)
         
         if (linux)
         {
-            await Network.Linux.NetworkService.SendSynPackets(options.TargetIp, options.TargetPort, options.SourceIp, options.SourcePort, options.Size);
+            await Linux.NetworkService.SendSynPackets(options.TargetIp, options.TargetPort, options.SourceIp, options.SourcePort, options.Size);
         }
     }
 }
