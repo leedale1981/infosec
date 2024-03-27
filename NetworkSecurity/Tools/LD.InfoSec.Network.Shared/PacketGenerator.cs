@@ -47,7 +47,71 @@ public static class PacketGenerator
         return stream.ToArray();
     }
     
-    public static byte[] GetRawIpWrapper(IPAddress sourceIpAddress, IPAddress targetIpAddress, ushort targetPort, ushort sourcePort)
+    public static byte[] GetIcmpPacketBytes(byte echoType, byte echoCode)
+    {
+        MemoryStream stream = new();
+        
+        byte[] typeBytes = [echoType];
+        Array.Reverse(typeBytes);
+        stream.Write(typeBytes, 0, 1);
+        
+        byte[] codeBytes = [echoCode];
+        Array.Reverse(codeBytes);
+        stream.Write(codeBytes, 0, 1);
+        
+        ushort checksum = CalculateInternetChecksum(stream.ToArray());
+        var checkSumBytes = BitConverter.GetBytes(checksum);
+        Array.Reverse(checkSumBytes);
+        stream.Write(checkSumBytes, 0, 2);
+        
+        var restOfHeaderBytes = BitConverter.GetBytes((uint)0);
+        Array.Reverse(restOfHeaderBytes);
+        stream.Write(restOfHeaderBytes, 0, 4);
+        
+        return stream.ToArray();
+    }
+
+    private static ushort CalculateInternetChecksum(IReadOnlyList<byte> buffer)
+    {
+        int length = buffer.Count;
+        int i = 0;
+        uint sum = 0;
+
+        while (length > 1)
+        {
+            uint data = (uint)(
+                ((uint)(buffer[i]) << 8)
+                |
+                ((uint)(buffer[i + 1]) & 0xFF)
+            );
+
+            sum += data;
+            if ((sum & 0xFFFF0000) > 0)
+            {
+                sum &= 0xFFFF;
+                sum += 1;
+            }
+
+            i += 2;
+            length -= 2;
+        }
+
+        if (length > 0)
+        {
+            sum += (uint)(buffer[i] << 8);
+            if ((sum & 0xFFFF0000) > 0)
+            {
+                sum &= 0xFFFF;
+                sum += 1;
+            }
+        }
+        
+        sum = ~sum;
+        sum &= 0xFFFF;
+        return (ushort)sum;
+    }
+
+    public static byte[] GetRawTcpSynPacketIpWrapper(IPAddress sourceIpAddress, IPAddress targetIpAddress, ushort targetPort, ushort sourcePort)
     {
         byte[] ipHeaderBytes = ConvertHexToByteArray("4500002c2680000034067ecc");
         byte[] sourceIpBytes = sourceIpAddress.GetAddressBytes();

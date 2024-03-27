@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using System.Text;
+using LD.InfoSec.Network.Shared;
 
 namespace LD.InfoSec.Network.Linux;
 
@@ -12,7 +14,7 @@ public static class NetworkService
         IPAddress targetIpAddress = IPAddress.Parse(targetIp);
         IPEndPoint ipEndPoint = new(targetIpAddress, targetPort);
         
-        byte[] packetBytes = Shared.PacketGenerator.GetRawIpWrapper(sourceIpAddress, targetIpAddress, targetPort, sourcePort);
+        byte[] packetBytes = Shared.PacketGenerator.GetRawTcpSynPacketIpWrapper(sourceIpAddress, targetIpAddress, targetPort, sourcePort);
         
         for (int index = 0; index < packetCount; index++)
         {

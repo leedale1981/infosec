@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LD.InfoSec.Network.Discovery\LD.InfoSec.Network.Discovery.csproj" />
     <ProjectReference Include="..\LD.InfoSec.Network.DoS\LD.InfoSec.Network.DoS.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,6 @@
-﻿namespace LD.InfoSec.Network.DoS;
+﻿using LD.InfoSec.Network.Shared;
+
+namespace LD.InfoSec.Network.DoS;
 
 public class AttackOptions
 {
@@ -8,4 +10,5 @@ public class AttackOptions
     public UInt16 SourcePort { get; set; }
     public DosType DosType { get; set; }
     public int Size { get; set; }
+    public PlatformType PlatformType { get; set; }
 }
