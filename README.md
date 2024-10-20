@@ -1,1 +1,1 @@
-## InfoSec Course
+## InfoSec
