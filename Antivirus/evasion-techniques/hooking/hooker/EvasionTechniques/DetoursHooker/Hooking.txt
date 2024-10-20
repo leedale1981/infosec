@@ -1,0 +1,7 @@
+Add hook:
+
+setdll.exe -d:RansomSafe.dll RansomSafeSimulator.exe
+
+Remove hooks:
+
+setdll.exe -r RansomSafeSimulator.exe
