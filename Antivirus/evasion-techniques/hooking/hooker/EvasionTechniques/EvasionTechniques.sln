@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DetoursHooker", "DetoursHooker\DetoursHooker.vcxproj", "{ACB430A6-54B5-4163-8200-7E3E51A6A901}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DetoursSimulator", "DetoursSimulator\DetoursSimulator.vcxproj", "{1A856F14-D1CE-4C50-84D9-D7C96E178E3A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -18,5 +20,13 @@ Global
 		{ACB430A6-54B5-4163-8200-7E3E51A6A901}.Release|Win32.Build.0 = Release|Win32
 		{ACB430A6-54B5-4163-8200-7E3E51A6A901}.Release|x64.ActiveCfg = Release|x64
 		{ACB430A6-54B5-4163-8200-7E3E51A6A901}.Release|x64.Build.0 = Release|x64
+		{1A856F14-D1CE-4C50-84D9-D7C96E178E3A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1A856F14-D1CE-4C50-84D9-D7C96E178E3A}.Debug|Win32.Build.0 = Debug|Win32
+		{1A856F14-D1CE-4C50-84D9-D7C96E178E3A}.Debug|x64.ActiveCfg = Debug|x64
+		{1A856F14-D1CE-4C50-84D9-D7C96E178E3A}.Debug|x64.Build.0 = Debug|x64
+		{1A856F14-D1CE-4C50-84D9-D7C96E178E3A}.Release|Win32.ActiveCfg = Release|Win32
+		{1A856F14-D1CE-4C50-84D9-D7C96E178E3A}.Release|Win32.Build.0 = Release|Win32
+		{1A856F14-D1CE-4C50-84D9-D7C96E178E3A}.Release|x64.ActiveCfg = Release|x64
+		{1A856F14-D1CE-4C50-84D9-D7C96E178E3A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 EndGlobal

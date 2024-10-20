@@ -6,7 +6,7 @@ static VOID (WINAPI * TrueSleep)(DWORD dwMilliseconds) = Sleep;
 
 VOID WINAPI TimedSleep(DWORD dwMilliseconds)
 {
-    printf("Detoured! Sleeping for %d milliseconds\n", dwMilliseconds);
+    printf("Oh no your not! Sleeping for %lu milliseconds\n", dwMilliseconds + 1000);
     TrueSleep(dwMilliseconds);
 }
 
