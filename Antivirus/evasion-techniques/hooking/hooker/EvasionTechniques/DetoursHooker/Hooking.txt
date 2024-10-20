@@ -5,3 +5,7 @@ setdll.exe -d:RansomSafe.dll RansomSafeSimulator.exe
 Remove hooks:
 
 setdll.exe -r RansomSafeSimulator.exe
+
+Compiling:
+
+cl /FR /nologo /Zi /Gm- /W3 /WX /we4777 /we4800 /Od /D_USRDLL /D_WINDLL RansomSafe.cpp advapi32.lib detours.lib /link /DLL /OUT:RansomSafe.dll /export:DetourFinishHelperProcess,@1 /export:DetouredCryptEncrypt
