@@ -11,3 +11,15 @@
 ## Testing web applications for vulnerabilities
 
 - [Reconnaissance](https://github.com/leedale1981/infosec/tree/master/WebSecurity/Reconnaissance)
+
+## Security Testing Approach
+
+[from](https://www.youtube.com/watch?v=TgAFqV50veQ)
+
+- Recon / Discovery
+- Authentication / Authorization attacks
+- Business logic / functionality attacks
+- Technology specific Attacks
+- SSRF
+- Injection
+- Vulnerability scanning
