@@ -1,17 +1,26 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
 	originalMessage := "Hello"
-	publicExponent := 65537 // known publically
-	p := 17                 // private
-	q := 23                 // private
-	n := p * q              // known publically
+	publicExponent := 17 // known publically
+	p := 65521           // private
+	q := 65519           // private
+	n := p * q           // known publically and its size defines the encryption space.
+	fmt.Println("Modulus = ", n)
+	fmt.Println("RSA Key size = ", bitLength(n))
 	cipher := encrypt(originalMessage, publicExponent, n)
 
 	// Decrypt the cipher by brute force by facorizing n to find the prime factors.
+	start := time.Now()
 	computedP, computedQ := factorize(n)
+	elapsed := time.Since(start)
+	fmt.Println("Factorizing n took = ", elapsed)
+
 	phi := (computedP - 1) * (computedQ - 1)           // private
 	privateExponent := modInverse(publicExponent, phi) // private
 
@@ -19,6 +28,15 @@ func main() {
 
 	fmt.Println("Original = ", originalMessage)
 	fmt.Println("Decrypted = ", decodedMessage)
+}
+
+func bitLength(n int) int {
+	length := 0
+	for n > 0 {
+		length++
+		n >>= 1
+	}
+	return length
 }
 
 func factorize(n int) (int, int) {
