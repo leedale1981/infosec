@@ -6,16 +6,13 @@ import (
 
 type rsa struct {
 	exponent int
-	Modulus  int
+	Modulus  *big.Int
 }
 
-func NewRSA(exponent int) *rsa {
-	p := 65521 // private
-	q := 65519 // private
-
+func NewRSA(exponent int, p *big.Int, q *big.Int) *rsa {
 	return &rsa{
 		exponent: exponent,
-		Modulus:  p * q,
+		Modulus:  new(big.Int).Mul(p, q),
 	}
 }
 
@@ -23,7 +20,7 @@ func (rsa *rsa) EncryptMessage(message string) []*big.Int {
 	cipher := make([]*big.Int, len(message))
 
 	for i, char := range message {
-		cipher[i] = new(big.Int).Exp(big.NewInt(int64(char)), big.NewInt(int64(rsa.exponent)), big.NewInt(int64(rsa.Modulus)))
+		cipher[i] = new(big.Int).Exp(big.NewInt(int64(char)), big.NewInt(int64(rsa.exponent)), rsa.Modulus)
 	}
 
 	return cipher
