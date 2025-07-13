@@ -9,12 +9,11 @@ import (
 )
 
 type attacker struct {
-	exponent int
-	modulus  *big.Int
+	publicKey *crypto.Key
 }
 
-func NewAttacker(exponent int, modulus *big.Int) *attacker {
-	return &attacker{exponent: exponent, modulus: modulus}
+func NewAttacker(publicKey *crypto.Key) *attacker {
+	return &attacker{publicKey: publicKey}
 }
 
 func (attacker *attacker) DecodeInterceptedMessage(cipher []*big.Int) string {
@@ -22,7 +21,7 @@ func (attacker *attacker) DecodeInterceptedMessage(cipher []*big.Int) string {
 	fmt.Println("Attacker is attempting to decode intercepted cipher")
 	start := time.Now()
 	//computedP, computedQ := crackers.NewRSACracker().Factorize(attacker.modulus)
-	computedP, computedQ := crackers.NewRSACracker().PollardsRho(attacker.modulus)
+	computedP, computedQ := crackers.NewRSACracker().PollardsRho(attacker.publicKey.Modulus)
 	elapsed := time.Since(start)
 	fmt.Println("Factorizing n took = ", elapsed)
 
@@ -30,7 +29,8 @@ func (attacker *attacker) DecodeInterceptedMessage(cipher []*big.Int) string {
 	newP := new(big.Int).Sub(computedP, big.NewInt(1))
 	newQ := new(big.Int).Sub(computedQ, big.NewInt(1))
 	phi := new(big.Int).Mul(newP, newQ)
-	privateExponent := new(big.Int).ModInverse(big.NewInt(int64(attacker.exponent)), phi)
-	rsa := crypto.NewRSA(attacker.exponent, computedP, computedQ)
-	return rsa.DecryptMessage(cipher, privateExponent, attacker.modulus)
+	privateExponent := new(big.Int).ModInverse(attacker.publicKey.Exponent, phi)
+	rsa := crypto.NewRSA()
+	crackedKey := &crypto.Key{Modulus: attacker.publicKey.Modulus, Exponent: privateExponent}
+	return rsa.DecryptMessage(cipher, crackedKey)
 }

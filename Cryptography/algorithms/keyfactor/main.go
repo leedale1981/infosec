@@ -2,20 +2,29 @@ package main
 
 import (
 	"compsci/keyfactor/components"
+	"compsci/keyfactor/crypto"
 	"fmt"
 )
 
 func main() {
-	// Some component is sending a message across a network.
+	// Generate keys used for message exchange
+	rsa := crypto.NewRSA()
+	publicKey, privateKey := rsa.GenerateKeyPair()
+
+	// Some component is sending a message across a network using the public key to encrypt.
 	originalMessage := "Hello"
-	publicExponent := 65537 // known publically
-	sender := components.NewSender(publicExponent)
+	sender := components.NewSender(publicKey)
 	cipher := sender.SendMessage(originalMessage)
 
+	// Some component is receiving the message and has access to the privateKey
+	receiver := components.NewReceiver(privateKey)
+	decodedMessage := receiver.ReceiveMessage(cipher)
+
 	// Some attacker has intercepted the message cipher and wants to decode it by factorizing the modulus.
-	attacker := components.NewAttacker(publicExponent, sender.Modulus)
-	decodedMessage := attacker.DecodeInterceptedMessage(cipher)
+	attacker := components.NewAttacker(publicKey)
+	crackedDecodedMessage := attacker.DecodeInterceptedMessage(cipher)
 
 	fmt.Println("Original message = ", originalMessage)
-	fmt.Println("Decrypted message= ", decodedMessage)
+	fmt.Println("Receiver decrypted message = ", decodedMessage)
+	fmt.Println("Attacker decrypted message = ", crackedDecodedMessage)
 }
