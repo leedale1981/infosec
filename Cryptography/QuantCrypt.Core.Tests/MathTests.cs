@@ -8,32 +8,32 @@ public class MathTests
     public void ModPolynomial_Add_Successful_Test()
     {
         // Arrange
-        Polynomial[] polynomialA = new[]
+        PolynomialTerm[] polynomialA = new[]
         {
-            new Polynomial(2, 4),
-            new Polynomial(3, 3),
-            new Polynomial(10, 1),
-            new Polynomial(3, 0)
+            new PolynomialTerm(2, 4),
+            new PolynomialTerm(3, 3),
+            new PolynomialTerm(10, 1),
+            new PolynomialTerm(3, 0)
         };
 
-        Polynomial[] polynomialB = new[]
+        PolynomialTerm[] polynomialB = new[]
         {
-            new Polynomial(3, 5),
-            new Polynomial(14, 3),
-            new Polynomial(10, 1),
-            new Polynomial(4, 0)
+            new PolynomialTerm(3, 5),
+            new PolynomialTerm(14, 3),
+            new PolynomialTerm(10, 1),
+            new PolynomialTerm(4, 0)
         };
 
         // Act
-        Polynomial[] actualResult = PolynomialOperations.AddMod(polynomialA, polynomialB, 17);
+        PolynomialTerm[] actualResult = PolynomialOperations.AddMod(polynomialA, polynomialB, 17);
         
         // Assert
-        Polynomial[] expectedResult = new[]
+        PolynomialTerm[] expectedResult = new[]
         {
-            new Polynomial(3, 5),
-            new Polynomial(2, 4),
-            new Polynomial(3, 1),
-            new Polynomial(7, 0)
+            new PolynomialTerm(3, 5),
+            new PolynomialTerm(2, 4),
+            new PolynomialTerm(3, 1),
+            new PolynomialTerm(7, 0)
         };
         expectedResult.OrderByDescending(p => p.Order);
 

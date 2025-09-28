@@ -1,16 +1,16 @@
 ﻿namespace QuantCrypt.Core.Math;
 
-public record Polynomial(int Coefficient, int Order);
+public record PolynomialTerm(int Coefficient, int Order);
 
 public static class PolynomialOperations
 {
-    public static Polynomial[] AddMod(Polynomial[] polynomialA, Polynomial[] polynomialB, int mod)
+    public static PolynomialTerm[] AddMod(PolynomialTerm[] polynomialA, PolynomialTerm[] polynomialB, int mod)
     {
-        List<Polynomial> result = new();
+        List<PolynomialTerm> result = new();
 
-        foreach (Polynomial poly in polynomialA)
+        foreach (PolynomialTerm poly in polynomialA)
         {
-            Polynomial? orderMatchPoly = polynomialB.FirstOrDefault(p => p.Order == poly.Order);
+            PolynomialTerm? orderMatchPoly = polynomialB.FirstOrDefault(p => p.Order == poly.Order);
             result.Add(orderMatchPoly is null ? 
                 poly with { Coefficient = poly.Coefficient % mod } : 
                 poly with { Coefficient = (poly.Coefficient + orderMatchPoly.Coefficient) % mod});
