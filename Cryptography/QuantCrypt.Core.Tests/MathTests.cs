@@ -39,4 +39,40 @@ public class MathTests
 
         Assert.True(expectedResult.SequenceEqual(actualResult));
     }
+    
+    [Fact]
+    public void ModPolynomial_Subtract_Successful_Test()
+    {
+        // Arrange
+        PolynomialTerm[] polynomialA = new[]
+        {
+            new PolynomialTerm(2, 4),
+            new PolynomialTerm(3, 3),
+            new PolynomialTerm(10, 1),
+            new PolynomialTerm(3, 0)
+        };
+
+        PolynomialTerm[] polynomialB = new[]
+        {
+            new PolynomialTerm(3, 5),
+            new PolynomialTerm(14, 3),
+            new PolynomialTerm(10, 1),
+            new PolynomialTerm(4, 0)
+        };
+
+        // Act
+        PolynomialTerm[] actualResult = PolynomialOperations.SubtractMod(polynomialA, polynomialB, 17);
+        
+        // Assert
+        PolynomialTerm[] expectedResult = new[]
+        {
+            new PolynomialTerm(14, 5),
+            new PolynomialTerm(2, 4),
+            new PolynomialTerm(6, 3),
+            new PolynomialTerm(16, 0)
+        };
+        expectedResult.OrderByDescending(p => p.Order);
+
+        Assert.True(expectedResult.SequenceEqual(actualResult));
+    }
 }
