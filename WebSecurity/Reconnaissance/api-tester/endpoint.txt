@@ -8,8 +8,14 @@
 /api-docs
 /openapi
 /openapi.json
+/openapi/v1.json
+/openapi/v2.json
+/openapi/v3.json
 /openapi.yaml
 /openapi.yml
+/openapi/v1.yaml
+/openapi/v2.yaml
+/openapi/v3.yaml
 /v1/openapi.json
 /v2/api-docs
 /v3/api-docs

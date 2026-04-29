@@ -42,14 +42,16 @@ It takes a base URL plus a line-delimited endpoint file, probes likely API/docum
 
 3. Probes each endpoint on the target base URL using likely HTTP verbs.
 
-4. Marks an endpoint as discovered when the response is not a plain 404/405 miss.
+4. If documentation endpoints are found (OpenAPI/Swagger/ReDoc), it fetches and parses docs to discover additional API paths, then probes those discovered paths too.
 
-5. Performs lightweight parameter probing:
+5. Marks an endpoint as discovered when the response is not a plain 404/405 miss.
+
+6. Performs lightweight parameter probing:
 
 - GET: tests common query params like id, q, page, limit
 - POST/PUT/PATCH: tests common JSON fields like id, name, email
 
-6. Prints colorized console output:
+7. Prints colorized console output:
 
 - Green: 2xx
 - Yellow: 401/403 (auth likely required)
@@ -97,6 +99,12 @@ Tune timeout and remote list size:
 go run . https://target.example.com -t 12 --remote-max-lines 400
 ```
 
+Generate an AI-based pentest risk summary from scan results:
+
+```bash
+go run . https://target.example.com --with-ai YOUR_OPENAI_API_KEY
+```
+
 ---
 
 ## CLI Arguments
@@ -115,6 +123,8 @@ Flags:
   - include public SecLists/PortSwigger/OWASP wordlist sources
 - --remote-max-lines int (default: 250)
   - max candidates loaded per remote list
+- --with-ai string (default: "")
+  - OpenAI API key to generate an AI risk/vulnerability summary for pentest reporting
 
 ---
 
@@ -124,6 +134,7 @@ Use one path per line:
 
 ```text
 /swagger
+/openapi/v1.json
 /v3/api-docs
 /.well-known/openid-configuration
 /graphql

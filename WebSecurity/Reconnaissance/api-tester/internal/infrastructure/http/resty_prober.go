@@ -54,13 +54,6 @@ func (p *RestyProber) Probe(ctx context.Context, baseURL, path, method string, q
 	return scan.ProbeResponse{
 		StatusCode: resp.StatusCode(),
 		Headers:    headers,
-		Body:       truncateBody(resp.String(), 200),
+		Body:       resp.String(),
 	}, nil
-}
-
-func truncateBody(input string, max int) string {
-	if max <= 0 || len(input) <= max {
-		return input
-	}
-	return input[:max]
 }

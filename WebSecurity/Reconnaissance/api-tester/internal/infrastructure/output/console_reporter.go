@@ -55,3 +55,16 @@ func (r *ConsoleReporter) Report(discoveries []domain.EndpointDiscovery) {
 		}
 	}
 }
+
+func (r *ConsoleReporter) ReportAISummary(summary string) {
+	headline := color.New(color.FgHiMagenta, color.Bold)
+	muted := color.New(color.FgHiBlack)
+
+	headline.Fprintln(r.out, "\nAI Risk Summary")
+	if strings.TrimSpace(summary) == "" {
+		muted.Fprintln(r.out, "No AI summary available.")
+		return
+	}
+
+	fmt.Fprintln(r.out, summary)
+}
