@@ -1,14 +1,14 @@
-# API Tester: Endpoint Recon Scanner
+# AI API Tester: Endpoint Recon and Risk Analyzer
 
-A fast, colorful console app for API reconnaissance.
+An AI-powered, colorful console app for API reconnaissance and pentest risk summarization.
 
-It takes a base URL plus a line-delimited endpoint file, probes likely API/documentation/well-known routes, and reports discovered endpoints with:
+It takes a base URL plus a line-delimited endpoint file, probes likely API/documentation/well-known routes, discovers additional endpoints from OpenAPI/Swagger docs, and reports:
 
-- HTTP method hints
-- status code behavior
-- likely accepted query parameters
-- likely accepted JSON body fields
-- source of the endpoint candidate list
+- discovered endpoints and HTTP verb behavior
+- likely accepted query parameters and JSON body fields
+- documentation-derived endpoint expansion results
+- AI-generated risk/vulnerability summary for pentesting
+- source attribution for endpoint candidates
 
 ---
 
@@ -30,7 +30,7 @@ It takes a base URL plus a line-delimited endpoint file, probes likely API/docum
 
 ---
 
-## What This Tool Does Exactly
+## What This AI Tool Does Exactly
 
 1. Loads endpoint candidates from:
 
@@ -56,6 +56,13 @@ It takes a base URL plus a line-delimited endpoint file, probes likely API/docum
 - Green: 2xx
 - Yellow: 401/403 (auth likely required)
 - Red: other non-404/non-405 discovered responses
+
+8. Optionally sends the full scan evidence to OpenAI and generates a structured pentest risk summary with:
+
+- Executive Summary
+- High/Medium/Low risk findings
+- recommended next tests
+- defensive remediation notes
 
 ---
 
