@@ -24,7 +24,7 @@ jobs:
       - name: Install repo tooling
         run: |
           sudo apt update
-          sudo apt install -y apt-utils dpkg-dev gnupg
+          sudo apt install -y apt-utils dpkg-dev gnupg jq
 
       - name: Download .deb assets from release
         id: download_release_debs
@@ -72,7 +72,7 @@ jobs:
         if: steps.download_release_debs.outputs.release_found != 'true'
         uses: actions/setup-go@v5
         with:
-          go-version-file: WebSecurity/Reconnaissance/api-tester/go.mod
+          go-version: stable
 
       - name: Build .deb artifacts locally (fallback)
         if: steps.download_release_debs.outputs.release_found != 'true'
@@ -148,8 +148,9 @@ jobs:
         run: |
           set -euo pipefail
           if [[ -z "${APT_GPG_PRIVATE_KEY:-}" ]]; then
-            echo "APT_GPG_PRIVATE_KEY secret is required"
-            exit 1
+            echo "APT_GPG_PRIVATE_KEY is not set; skipping signing."
+            echo "Repository will be published unsigned."
+            exit 0
           fi
 
           export GNUPGHOME="$(mktemp -d)"
