@@ -18,12 +18,16 @@ jobs:
       VERSION: ${{ inputs.version }}
       REPOSITORY: ${{ github.repository }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Install repo tooling
         run: |
           sudo apt update
           sudo apt install -y apt-utils dpkg-dev gnupg
 
       - name: Download .deb assets from release
+        id: download_release_debs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
@@ -44,21 +48,71 @@ jobs:
           done
 
           if [[ -z "${release_json}" ]]; then
-            echo "Unable to resolve release for VERSION=${VERSION}. Tried tags v${VERSION} and ${VERSION}."
-            exit 1
+            echo "Release not found for VERSION=${VERSION}; falling back to local .deb build."
+            echo "release_found=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
           amd64_url="$(jq -r --arg v "${VERSION}" '.assets[] | select(.name | test("^api-tester_" + $v + "(_linux)?_(amd64|x86_64)\\.deb$")) | .browser_download_url' <<<"${release_json}" | head -n1)"
           arm64_url="$(jq -r --arg v "${VERSION}" '.assets[] | select(.name | test("^api-tester_" + $v + "(_linux)?_(arm64|aarch64)\\.deb$")) | .browser_download_url' <<<"${release_json}" | head -n1)"
 
           if [[ -z "${amd64_url}" || -z "${arm64_url}" ]]; then
-            echo "Required .deb assets not found for VERSION=${VERSION}. Available release assets:"
+            echo "Release found, but matching .deb assets were not found; falling back to local .deb build."
+            echo "Available release assets:"
             jq -r '.assets[].name' <<<"${release_json}"
-            exit 1
+            echo "release_found=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
           curl -fsSL "${amd64_url}" -o "dist/api-tester_${VERSION}_amd64.deb"
           curl -fsSL "${arm64_url}" -o "dist/api-tester_${VERSION}_arm64.deb"
+          echo "release_found=true" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Go for local package build fallback
+        if: steps.download_release_debs.outputs.release_found != 'true'
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: WebSecurity/Reconnaissance/api-tester/go.mod
+
+      - name: Build .deb artifacts locally (fallback)
+        if: steps.download_release_debs.outputs.release_found != 'true'
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          version: latest
+          workdir: WebSecurity/Reconnaissance/api-tester
+          args: release --clean --snapshot --skip=publish --skip=announce --skip=validate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Normalize fallback .deb filenames
+        if: steps.download_release_debs.outputs.release_found != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          mkdir -p dist
+
+          copied=0
+          for deb in WebSecurity/Reconnaissance/api-tester/dist/*.deb; do
+            base="$(basename "$deb")"
+            arch=""
+            if [[ "$base" =~ _(amd64|x86_64)\.deb$ ]]; then
+              arch="amd64"
+            elif [[ "$base" =~ _(arm64|aarch64)\.deb$ ]]; then
+              arch="arm64"
+            fi
+
+            if [[ -n "$arch" ]]; then
+              cp "$deb" "dist/api-tester_${VERSION}_${arch}.deb"
+              copied=$((copied + 1))
+            fi
+          done
+
+          if [[ "$copied" -lt 2 ]]; then
+            echo "Unable to prepare both amd64 and arm64 .deb files from fallback build."
+            ls -la WebSecurity/Reconnaissance/api-tester/dist || true
+            exit 1
+          fi
 
       - name: Build apt repository files
         shell: bash
