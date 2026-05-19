@@ -24,12 +24,41 @@ jobs:
           sudo apt install -y apt-utils dpkg-dev gnupg
 
       - name: Download .deb assets from release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p dist
-          curl -fsSL "https://github.com/${REPOSITORY}/releases/download/v${VERSION}/api-tester_${VERSION}_amd64.deb" -o "dist/api-tester_${VERSION}_amd64.deb"
-          curl -fsSL "https://github.com/${REPOSITORY}/releases/download/v${VERSION}/api-tester_${VERSION}_arm64.deb" -o "dist/api-tester_${VERSION}_arm64.deb"
+
+          release_json=""
+          for tag in "v${VERSION}" "${VERSION}"; do
+            url="https://api.github.com/repos/${REPOSITORY}/releases/tags/${tag}"
+            if release_json="$(curl -fsSL \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "$url")"; then
+              echo "Resolved release tag: ${tag}"
+              break
+            fi
+          done
+
+          if [[ -z "${release_json}" ]]; then
+            echo "Unable to resolve release for VERSION=${VERSION}. Tried tags v${VERSION} and ${VERSION}."
+            exit 1
+          fi
+
+          amd64_url="$(jq -r --arg v "${VERSION}" '.assets[] | select(.name | test("^api-tester_" + $v + "(_linux)?_(amd64|x86_64)\\.deb$")) | .browser_download_url' <<<"${release_json}" | head -n1)"
+          arm64_url="$(jq -r --arg v "${VERSION}" '.assets[] | select(.name | test("^api-tester_" + $v + "(_linux)?_(arm64|aarch64)\\.deb$")) | .browser_download_url' <<<"${release_json}" | head -n1)"
+
+          if [[ -z "${amd64_url}" || -z "${arm64_url}" ]]; then
+            echo "Required .deb assets not found for VERSION=${VERSION}. Available release assets:"
+            jq -r '.assets[].name' <<<"${release_json}"
+            exit 1
+          fi
+
+          curl -fsSL "${amd64_url}" -o "dist/api-tester_${VERSION}_amd64.deb"
+          curl -fsSL "${arm64_url}" -o "dist/api-tester_${VERSION}_arm64.deb"
 
       - name: Build apt repository files
         shell: bash
