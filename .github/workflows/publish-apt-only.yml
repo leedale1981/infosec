@@ -189,10 +189,10 @@ jobs:
           # If public.key doesn't exist (signing was skipped), create a placeholder
           if [[ ! -f "apt/public.key" ]]; then
             echo "Creating placeholder public.key (no signing configured)"
-            cat > apt/public.key <<'EOF'
-This APT repository is not cryptographically signed.
-To use signed repositories, configure APT_GPG_PRIVATE_KEY in GitHub secrets.
-EOF
+            printf '%s\n' \
+              'This APT repository is not cryptographically signed.' \
+              'To use signed repositories, configure APT_GPG_PRIVATE_KEY in GitHub secrets.' \
+              > apt/public.key
           fi
           
           # List what will be published
