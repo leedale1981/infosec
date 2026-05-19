@@ -1,0 +1,15 @@
+Package: api-tester
+Version: 0.0.0~SNAPSHOT-d5dd704
+Architecture: amd64
+Maintainer: leedale1981
+Installed-Size: 7508
+Filename: apt/pool/main/a/api-tester/api-tester_1.0.0_amd64.deb
+Size: 3245592
+MD5sum: 29b8f5b5fc7b90465873c06eeaa9cf71
+SHA1: 885ba63dc40fd385c96bbafc07cd7030e6e3a746
+SHA256: 48b917ace9e1a71cc0017103c7e5527a0f34c36fe03e0f7a58b31e3ff8fb46b4
+Priority: optional
+Homepage: https://github.com/leedale1981/infosec
+Description: AI-powered API endpoint reconnaissance and risk analysis CLI.
+Architecture-Variant: amd64v1
+

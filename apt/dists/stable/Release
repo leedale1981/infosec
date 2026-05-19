@@ -1,0 +1,32 @@
+Architectures: amd64 arm64
+Codename: stable
+Components: main
+Date: Tue, 19 May 2026 12:07:11 +0000
+Description: api-tester APT repository
+Label: api-tester
+Origin: api-tester
+Suite: stable
+MD5Sum:
+ 85f1d39366724e178b0b7d7e61e67bb7              189 Release
+ 0c3540d9c5163b59023d428163a4766c              530 main/binary-amd64/Packages
+ 4daff691f13b7d522643941e53053f35              401 main/binary-amd64/Packages.gz
+ 5261a333bd8d69cbefe29687cf5e3f96              500 main/binary-arm64/Packages
+ 90152ee132a425d3676649f8d1c8cf4e              385 main/binary-arm64/Packages.gz
+SHA1:
+ d8b6effee1ebb826f69c6b0d1ffe75240b567cc3              189 Release
+ 60f6bad5953732badd9f1aa07c65b446afe7e130              530 main/binary-amd64/Packages
+ bfe78efde722d5d3512bc3119062acd48b004126              401 main/binary-amd64/Packages.gz
+ 0a7982033ed3908cb124edc2713f91b107f8dbf7              500 main/binary-arm64/Packages
+ 2149fd32826e3479e7ca7c83737c2060c83c05cb              385 main/binary-arm64/Packages.gz
+SHA256:
+ c16c4f628bb99a3ff810891f6976dd6470b5975daf262399d055653fd8dc7db1              189 Release
+ 066e800b11c3f738dac609f97f757c2c6ba8722759b89b09db3697ae439e1e96              530 main/binary-amd64/Packages
+ 1d9f7cfbc647f34f273758e64b3d62a61d45c74d5cd7cf464b87b4061ab18785              401 main/binary-amd64/Packages.gz
+ 024666918a7ed070e4c4a2e28ddc00d285f44bce2ff8410f51f900dd318678cf              500 main/binary-arm64/Packages
+ cdbd4055073fc2e188e0243c7ce923dbcd6e52b7de5e28b03bfa6e08c7724bfd              385 main/binary-arm64/Packages.gz
+SHA512:
+ a4955db7c353c5b7832159f8d2ca67d0d89f659d42f9a91cc399da4f80f6eaaadcd2a5662fedd522a8bb798016dd22cc8f44857bfa1fbc0e4beeb16ca4a0b319              189 Release
+ a106b75e5795c46bfa3a1f5fd23f5dc02ec792065dfb21a5377d9bc49e3f2a2cc735ea21b22a5f0f2c131bd331012fcc35f2247af85e80ffeec5a632b594b35b              530 main/binary-amd64/Packages
+ 63a611d43fa8d4d10e8384c16f6c9a36b4ffe2c1cdb48425ada2ce06dada6fd459f1a3af1b94078431b10aba58f95479052a55b699e1637e6ed25bcef4fb80d5              401 main/binary-amd64/Packages.gz
+ af122153e4442455015adf2ee7d2388799013a1c7f149c41b5da030b773a3d1023ec86289038068a4c5c17fa9433c17569d9690abca5c8d85d8eae71256950c2              500 main/binary-arm64/Packages
+ 4689049bb2e1856ceb5dbfc6d24d26876fc77f3065591c1f332ce4505f305a2e379ea515199cb3d0d79ef84e1ca0e58aa5413ca5d6fc5eaaecf41f3222c23eec              385 main/binary-arm64/Packages.gz
