@@ -172,13 +172,9 @@ jobs:
             gpg --batch --yes -u "$KEY_ID" --clearsign -o apt/dists/stable/InRelease apt/dists/stable/Release
           fi
 
+          mkdir -p apt
           gpg --batch --yes --output apt/public.key --armor --export "$KEY_ID"
-          
-          if [[ ! -f "apt/public.key" ]]; then
-            echo "Warning: public.key export may have failed; checking..."
-            ls -la apt/
-            exit 1
-          fi
+          echo "GPG public key exported to apt/public.key"
 
       - name: Ensure apt directory structure is complete
         shell: bash
@@ -198,6 +194,22 @@ jobs:
           # List what will be published
           echo "Files to be published:"
           find apt -type f | sort
+
+      - name: Verify public.key exists before publishing
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Current working directory: $(pwd)"
+          echo "Contents of apt/ directory:"
+          ls -laR apt/ || { echo "apt/ directory does not exist"; exit 1; }
+          
+          if [[ ! -f "apt/public.key" ]]; then
+            echo "ERROR: apt/public.key file is missing!"
+            exit 1
+          fi
+          
+          echo "public.key file found and contains:"
+          head -5 apt/public.key
 
       - name: Publish apt repo to gh-pages
         uses: peaceiris/actions-gh-pages@v4
