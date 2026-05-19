@@ -173,6 +173,31 @@ jobs:
           fi
 
           gpg --batch --yes --output apt/public.key --armor --export "$KEY_ID"
+          
+          if [[ ! -f "apt/public.key" ]]; then
+            echo "Warning: public.key export may have failed; checking..."
+            ls -la apt/
+            exit 1
+          fi
+
+      - name: Ensure apt directory structure is complete
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p apt
+          
+          # If public.key doesn't exist (signing was skipped), create a placeholder
+          if [[ ! -f "apt/public.key" ]]; then
+            echo "Creating placeholder public.key (no signing configured)"
+            cat > apt/public.key <<'EOF'
+This APT repository is not cryptographically signed.
+To use signed repositories, configure APT_GPG_PRIVATE_KEY in GitHub secrets.
+EOF
+          fi
+          
+          # List what will be published
+          echo "Files to be published:"
+          find apt -type f | sort
 
       - name: Publish apt repo to gh-pages
         uses: peaceiris/actions-gh-pages@v4
