@@ -1,0 +1,100 @@
+name: publish-apt-only
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version without v prefix (example: 1.0.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  publish-apt:
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.version }}
+      REPOSITORY: ${{ github.repository }}
+    steps:
+      - name: Install repo tooling
+        run: |
+          sudo apt update
+          sudo apt install -y apt-utils dpkg-dev gnupg
+
+      - name: Download .deb assets from release
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          curl -fsSL "https://github.com/${REPOSITORY}/releases/download/v${VERSION}/api-tester_${VERSION}_amd64.deb" -o "dist/api-tester_${VERSION}_amd64.deb"
+          curl -fsSL "https://github.com/${REPOSITORY}/releases/download/v${VERSION}/api-tester_${VERSION}_arm64.deb" -o "dist/api-tester_${VERSION}_arm64.deb"
+
+      - name: Build apt repository files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p apt/pool/main/a/api-tester
+          cp dist/api-tester_"${VERSION}"_*.deb apt/pool/main/a/api-tester/
+
+          mkdir -p apt/dists/stable/main/binary-amd64
+          mkdir -p apt/dists/stable/main/binary-arm64
+
+          dpkg-scanpackages --arch amd64 apt/pool > apt/dists/stable/main/binary-amd64/Packages
+          gzip -kf apt/dists/stable/main/binary-amd64/Packages
+
+          dpkg-scanpackages --arch arm64 apt/pool > apt/dists/stable/main/binary-arm64/Packages
+          gzip -kf apt/dists/stable/main/binary-arm64/Packages
+
+          apt-ftparchive \
+            -o APT::FTPArchive::Release::Origin="api-tester" \
+            -o APT::FTPArchive::Release::Label="api-tester" \
+            -o APT::FTPArchive::Release::Suite="stable" \
+            -o APT::FTPArchive::Release::Codename="stable" \
+            -o APT::FTPArchive::Release::Architectures="amd64 arm64" \
+            -o APT::FTPArchive::Release::Components="main" \
+            -o APT::FTPArchive::Release::Description="api-tester APT repository" \
+            release apt/dists/stable > apt/dists/stable/Release
+
+      - name: Import signing key and sign release metadata
+        env:
+          APT_GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
+          APT_GPG_PASSPHRASE: ${{ secrets.APT_GPG_PASSPHRASE }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${APT_GPG_PRIVATE_KEY:-}" ]]; then
+            echo "APT_GPG_PRIVATE_KEY secret is required"
+            exit 1
+          fi
+
+          export GNUPGHOME="$(mktemp -d)"
+          trap 'rm -rf "$GNUPGHOME"' EXIT
+
+          echo "$APT_GPG_PRIVATE_KEY" | gpg --batch --import
+          KEY_ID="$(gpg --list-secret-keys --keyid-format=long | awk '/sec/{print $2}' | awk -F'/' '{print $2}' | head -n1)"
+
+          if [[ -z "$KEY_ID" ]]; then
+            echo "Unable to resolve GPG key ID"
+            exit 1
+          fi
+
+          if [[ -n "${APT_GPG_PASSPHRASE:-}" ]]; then
+            gpg --batch --yes --pinentry-mode loopback --passphrase "$APT_GPG_PASSPHRASE" -u "$KEY_ID" -abs -o apt/dists/stable/Release.gpg apt/dists/stable/Release
+            gpg --batch --yes --pinentry-mode loopback --passphrase "$APT_GPG_PASSPHRASE" -u "$KEY_ID" --clearsign -o apt/dists/stable/InRelease apt/dists/stable/Release
+          else
+            gpg --batch --yes -u "$KEY_ID" -abs -o apt/dists/stable/Release.gpg apt/dists/stable/Release
+            gpg --batch --yes -u "$KEY_ID" --clearsign -o apt/dists/stable/InRelease apt/dists/stable/Release
+          fi
+
+          gpg --batch --yes --output apt/public.key --armor --export "$KEY_ID"
+
+      - name: Publish apt repo to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: apt
+          destination_dir: apt
+          keep_files: true

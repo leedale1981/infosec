@@ -68,6 +68,8 @@ It takes a base URL plus a line-delimited endpoint file, probes likely API/docum
 
 ## Installation
 
+### Build From Source (Any Platform)
+
 Requirements:
 
 - Go 1.26+
@@ -76,7 +78,131 @@ From the project folder:
 
 ```bash
 go mod tidy
+go build -o dist/api-tester .
 ```
+
+Or with Make targets:
+
+```bash
+make build
+make test
+```
+
+### Build Release Artifacts (Binary + .deb)
+
+This project includes a GoReleaser config that builds:
+
+- Linux binaries (`tar.gz`)
+- Windows binaries (`zip`)
+- Debian package (`.deb`) for apt-based installs
+
+Install GoReleaser, then run:
+
+```bash
+make release-snapshot
+```
+
+Artifacts are generated into `dist/`.
+
+### Linux (APT Install)
+
+Install from the published APT repository:
+
+```bash
+curl -fsSL https://leedale1981.github.io/infosec/apt/public.key \
+  | sudo gpg --dearmor -o /usr/share/keyrings/api-tester-archive-keyring.gpg
+
+echo "deb [signed-by=/usr/share/keyrings/api-tester-archive-keyring.gpg arch=amd64,arm64] https://leedale1981.github.io/infosec/apt stable main" \
+  | sudo tee /etc/apt/sources.list.d/api-tester.list >/dev/null
+
+sudo apt update
+sudo apt install -y api-tester
+```
+
+If you already have a `.deb` artifact locally:
+
+```bash
+sudo apt install ./dist/api-tester_<version>_<arch>.deb
+```
+
+Install directly from a GitHub release using the helper script:
+
+```bash
+chmod +x scripts/install-apt.sh
+./scripts/install-apt.sh 1.0.0 leedale1981/infosec
+```
+
+Arguments:
+
+- `<version>`: release version without the `v` prefix (example: `1.0.0`)
+- `[repo]`: optional GitHub repo in `owner/name` format (default: `leedale1981/infosec`)
+
+### Windows (WinGet)
+
+Install from WinGet:
+
+```powershell
+winget install --id leedale1981.api-tester --exact --source winget
+```
+
+Upgrade:
+
+```powershell
+winget upgrade --id leedale1981.api-tester --exact --source winget
+```
+
+### Windows (PowerShell Install Script)
+
+Install the latest release:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
+```
+
+Install a specific version:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1 -Version 1.0.0 -Repo leedale1981/infosec
+```
+
+The script installs `api-tester.exe` into:
+
+```text
+%LOCALAPPDATA%\Programs\api-tester
+```
+
+and adds that directory to the user `PATH` if needed.
+
+### Automated Publishing (All 3 Workflows)
+
+This repo now supports three release/publish workflows:
+
+1. Full publish: `.github/workflows/release-and-publish.yml`
+2. APT-only republish: `.github/workflows/publish-apt-only.yml`
+3. WinGet-only republish: `.github/workflows/publish-winget-only.yml`
+
+#### 1) Full Publish (Recommended)
+
+Tagging a version like `v1.0.0` triggers `.github/workflows/release-and-publish.yml`, which:
+
+- builds and publishes release artifacts with GoReleaser
+- updates the APT repo hosted on GitHub Pages (`gh-pages/apt`)
+- submits a WinGet manifest update via `wingetcreate`
+
+#### 2) APT-Only Republish
+
+Use Actions -> `publish-apt-only` and provide `version` (for example `1.0.0`) to rebuild and republish only the APT repository from existing release `.deb` assets.
+
+#### 3) WinGet-Only Republish
+
+Use Actions -> `publish-winget-only` and provide `version` (for example `1.0.0`) to submit only the WinGet manifest update from the existing release Windows artifact.
+
+Required repository configuration:
+
+- Secret: `APT_GPG_PRIVATE_KEY` (ASCII-armored private key for signing APT metadata)
+- Optional Secret: `APT_GPG_PASSPHRASE` (if the key is passphrase-protected)
+- Secret: `WINGET_TOKEN` (GitHub token allowed to submit to `microsoft/winget-pkgs`)
+- Optional Variable: `WINGET_PACKAGE_IDENTIFIER` (override default `leedale1981.api-tester`)
 
 ---
 

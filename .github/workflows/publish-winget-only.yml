@@ -1,0 +1,39 @@
+name: publish-winget-only
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version without v prefix (example: 1.0.0)"
+        required: true
+        type: string
+
+jobs:
+  publish-winget:
+    runs-on: windows-latest
+    steps:
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install wingetcreate
+        shell: pwsh
+        run: dotnet tool install --global Microsoft.WingetCreateCLI
+
+      - name: Submit WinGet manifest update
+        shell: pwsh
+        env:
+          VERSION: ${{ inputs.version }}
+          REPOSITORY: ${{ github.repository }}
+          PACKAGE_IDENTIFIER: ${{ vars.WINGET_PACKAGE_IDENTIFIER || 'leedale1981.api-tester' }}
+          WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:WINGET_TOKEN)) {
+              throw "Secret WINGET_TOKEN is required"
+          }
+
+          $zipUrl = "https://github.com/$env:REPOSITORY/releases/download/v$env:VERSION/api-tester_${env:VERSION}_windows_amd64.zip"
+          $env:PATH = "$env:USERPROFILE\.dotnet\tools;$env:PATH"
+
+          wingetcreate update $env:PACKAGE_IDENTIFIER --version $env:VERSION --urls $zipUrl --token $env:WINGET_TOKEN --submit

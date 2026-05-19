@@ -1,0 +1,45 @@
+project_name: api-tester
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: api-tester
+    main: .
+    binary: api-tester
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - id: binaries
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+
+nfpms:
+  - id: linux-deb
+    package_name: api-tester
+    file_name_template: "{{ .PackageName }}_{{ .Version }}_{{ .Arch }}"
+    vendor: leedale1981
+    homepage: https://github.com/leedale1981/infosec
+    maintainer: leedale1981
+    description: AI-powered API endpoint reconnaissance and risk analysis CLI.
+    license: MIT
+    formats:
+      - deb
+    bindir: /usr/bin
+
+release:
+  draft: false
+  prerelease: auto
