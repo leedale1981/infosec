@@ -70,6 +70,16 @@ Reference notes and techniques for web application reconnaissance including Burp
 
 ---
 
+## 🤖 AI Security
+
+> Practical AI security demos focused on prompt-injection risk and defenses in RAG systems.
+
+### 🧠 [Indirect Prompt Injection in RAG (SharePoint + Ollama)](https://github.com/leedale1981/infosec/tree/master/AISecurity)
+
+A short end-to-end demo showing how a single malicious document in a SharePoint policy library can poison retrieved context and influence a local Ollama model to return incorrect company policy answers, plus hardened/scanned mitigation paths.
+
+---
+
 ## 🔌 Network Security
 
 > Low-level network tools for discovery, packet crafting, and authorized stress testing.
