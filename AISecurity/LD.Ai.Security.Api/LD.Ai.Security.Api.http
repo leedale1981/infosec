@@ -1,0 +1,11 @@
+@LD.Ai.Security.Api_HostAddress = http://localhost:5194
+
+GET {{LD.Ai.Security.Api_HostAddress}}/openapi/v1.json
+Accept: application/json
+
+###
+
+GET {{LD.Ai.Security.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
