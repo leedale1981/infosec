@@ -2,9 +2,9 @@
 
 using System.Text.RegularExpressions;
 
-public static class SimpleRetriever
+public sealed class KeywordRetrievalScorer : IRetrievalScorer
 {
-    public static int Score(string question, string content, string name)
+    public int Score(string question, string content, string name)
     {
         var queryTerms = Tokenize(question);
         var text = $"{name} {content}".ToLowerInvariant();

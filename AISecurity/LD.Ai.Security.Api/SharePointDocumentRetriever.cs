@@ -2,197 +2,59 @@
 
 using Azure.Identity;
 using DocumentFormat.OpenXml.Packaging;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
+using Microsoft.Kiota.Abstractions;
 
-public sealed class SharePointDocumentRetriever
+public sealed class SharePointDocumentRetriever : IDocumentRetriever
 {
     private readonly GraphServiceClient _graph;
-    private readonly IConfiguration _config;
+    private readonly GraphOptions _options;
+    private readonly IDocumentTextExtractor _textExtractor;
+    private readonly IRetrievalScorer _scorer;
+    private readonly IPromptInjectionScanner _scanner;
     private readonly ILogger<SharePointDocumentRetriever> _logger;
 
     public SharePointDocumentRetriever(
-        IConfiguration config,
+        IOptions<GraphOptions> graphOptions,
+        IDocumentTextExtractor textExtractor,
+        IRetrievalScorer scorer,
+        IPromptInjectionScanner scanner,
         ILogger<SharePointDocumentRetriever> logger)
     {
-        _config = config;
+        _options = graphOptions.Value;
+        _options.Validate();
+
+        _textExtractor = textExtractor;
+        _scorer = scorer;
+        _scanner = scanner;
         _logger = logger;
 
-        var tenantId = config["Graph:TenantId"];
-        var clientId = config["Graph:ClientId"];
-        var clientSecret = config["Graph:ClientSecret"];
-
-        if (string.IsNullOrWhiteSpace(tenantId) ||
-            string.IsNullOrWhiteSpace(clientId) ||
-            string.IsNullOrWhiteSpace(clientSecret))
-        {
-            throw new InvalidOperationException(
-                "Graph configuration is missing. Check Graph:TenantId, Graph:ClientId, and Graph:ClientSecret.");
-        }
-
         var credential = new ClientSecretCredential(
-            tenantId,
-            clientId,
-            clientSecret);
+            _options.TenantId,
+            _options.ClientId,
+            _options.ClientSecret);
 
         _graph = new GraphServiceClient(
             credential,
             ["https://graph.microsoft.com/.default"]);
     }
 
-    public async Task<IReadOnlyList<RetrievedDocument>> RetrieveAsync(
-        string question,
-        CancellationToken ct = default)
+    public async Task<IReadOnlyList<RetrievedDocument>> RetrieveAsync(string question, CancellationToken ct = default)
     {
-        var host = RequireConfig("Graph:SharePointHost");
-        var sitePath = RequireConfig("Graph:SitePath");
-        var libraryName = RequireConfig("Graph:LibraryName");
-
-        // Can be blank because your files currently sit directly in Policy Documents.
-        var folderPath = _config["Graph:FolderPath"]?.Trim();
-
-        _logger.LogInformation(
-            "Resolving SharePoint site. Host={Host}, SitePath={SitePath}, Library={LibraryName}, Folder={FolderPath}",
-            host,
-            sitePath,
-            libraryName,
-            string.IsNullOrWhiteSpace(folderPath) ? "<library root>" : folderPath);
-
-        var site = await _graph
-            .Sites[$"{host}:{sitePath}"]
-            .GetAsync(cancellationToken: ct);
-
-        if (site?.Id is null)
-        {
-            throw new InvalidOperationException(
-                $"Could not resolve SharePoint site '{host}{sitePath}'.");
-        }
-
-        _logger.LogInformation(
-            "Resolved SharePoint site. SiteId={SiteId}, Name={SiteName}",
-            site.Id,
-            site.DisplayName);
-
-        var drivesResponse = await _graph
-            .Sites[site.Id]
-            .Drives
-            .GetAsync(cancellationToken: ct);
-
-        var drives = drivesResponse?.Value ?? [];
-
-        _logger.LogInformation(
-            "Found {DriveCount} document libraries on site '{SiteName}'.",
-            drives.Count,
-            site.DisplayName);
-
-        foreach (var candidate in drives)
-        {
-            _logger.LogInformation(
-                "Available library: Name={DriveName}, Id={DriveId}",
-                candidate.Name,
-                candidate.Id);
-        }
-
-        var drive = drives.FirstOrDefault(d =>
-            string.Equals(
-                d.Name,
-                libraryName,
-                StringComparison.OrdinalIgnoreCase));
-
-        if (drive?.Id is null)
-        {
-            var availableLibraries = string.Join(
-                ", ",
-                drives
-                    .Where(d => !string.IsNullOrWhiteSpace(d.Name))
-                    .Select(d => $"'{d.Name}'"));
-
-            throw new InvalidOperationException(
-                $"Could not find SharePoint document library '{libraryName}'. " +
-                $"Available libraries: {availableLibraries}");
-        }
-
-        _logger.LogInformation(
-            "Using SharePoint library. Name={DriveName}, Id={DriveId}",
-            drive.Name,
-            drive.Id);
-
-        var items = await GetFilesFromConfiguredLocationAsync(
-            drive.Id,
-            drive.Name ?? libraryName,
-            folderPath,
-            ct);
+        var site = await ResolveSiteAsync(ct);
+        var drive = await ResolveDriveAsync(site.Id!, ct);
+        var items = await GetFilesFromConfiguredLocationAsync(drive.Id!, drive.Name ?? _options.LibraryName, _options.FolderPath, ct);
 
         var docs = new List<RetrievedDocument>();
 
-        foreach (var item in items)
+        foreach (var item in items.Where(IsCandidateFile))
         {
-            if (item.Id is null || item.Name is null || item.File is null)
+            var document = await TryCreateDocumentAsync(item, drive.Id!, question, ct);
+            if (document is not null)
             {
-                continue;
-            }
-
-            if (!IsSupportedFile(item.Name))
-            {
-                _logger.LogDebug(
-                    "Skipping unsupported file type: {FileName}",
-                    item.Name);
-
-                continue;
-            }
-
-            try
-            {
-                await using var stream = await _graph
-                    .Drives[drive.Id]
-                    .Items[item.Id]
-                    .Content
-                    .GetAsync(cancellationToken: ct);
-
-                if (stream is null)
-                {
-                    _logger.LogWarning(
-                        "No content stream returned for SharePoint file {FileName} ({ItemId}).",
-                        item.Name,
-                        item.Id);
-
-                    continue;
-                }
-
-                var content = await ExtractTextAsync(item.Name, stream, ct);
-
-                if (string.IsNullOrWhiteSpace(content))
-                {
-                    _logger.LogWarning(
-                        "No readable text was extracted from {FileName}.",
-                        item.Name);
-
-                    continue;
-                }
-
-                var score = SimpleRetriever.Score(question, content, item.Name);
-                var suspicious = PromptInjectionScanner.LooksSuspicious(content);
-
-                docs.Add(new RetrievedDocument(
-                    item.Name,
-                    content,
-                    score,
-                    suspicious));
-
-                _logger.LogInformation(
-                    "Retrieved {FileName}. Score={Score}, Suspicious={Suspicious}, Characters={Characters}",
-                    item.Name,
-                    score,
-                    suspicious,
-                    content.Length);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Failed to download or extract text from SharePoint file {FileName} ({ItemId}).",
-                    item.Name,
-                    item.Id);
+                docs.Add(document);
             }
         }
 
@@ -203,59 +65,70 @@ public sealed class SharePointDocumentRetriever
             .ToList();
     }
 
+    private async Task<Site> ResolveSiteAsync(CancellationToken ct)
+    {
+        _logger.LogInformation(
+            "Resolving SharePoint site. Host={Host}, SitePath={SitePath}, Library={LibraryName}, Folder={FolderPath}",
+            _options.SharePointHost,
+            _options.SitePath,
+            _options.LibraryName,
+            string.IsNullOrWhiteSpace(_options.FolderPath) ? "<library root>" : _options.FolderPath);
+
+        var site = await _graph
+            .Sites[$"{_options.SharePointHost}:{_options.SitePath}"]
+            .GetAsync(cancellationToken: ct);
+
+        if (site?.Id is null)
+        {
+            throw new InvalidOperationException($"Could not resolve SharePoint site '{_options.SharePointHost}{_options.SitePath}'.");
+        }
+
+        _logger.LogInformation("Resolved SharePoint site. SiteId={SiteId}, Name={SiteName}", site.Id, site.DisplayName);
+        return site;
+    }
+
+    private async Task<Drive> ResolveDriveAsync(string siteId, CancellationToken ct)
+    {
+        var drivesResponse = await _graph
+            .Sites[siteId]
+            .Drives
+            .GetAsync(cancellationToken: ct);
+
+        var drives = drivesResponse?.Value ?? [];
+
+        _logger.LogInformation("Found {DriveCount} document libraries on site.", drives.Count);
+
+        foreach (var candidate in drives)
+        {
+            _logger.LogInformation("Available library: Name={DriveName}, Id={DriveId}", candidate.Name, candidate.Id);
+        }
+
+        var drive = drives.FirstOrDefault(d =>
+            string.Equals(d.Name, _options.LibraryName, StringComparison.OrdinalIgnoreCase));
+
+        if (drive?.Id is null)
+        {
+            var availableLibraries = string.Join(
+                ", ",
+                drives.Where(d => !string.IsNullOrWhiteSpace(d.Name)).Select(d => $"'{d.Name}'"));
+
+            throw new InvalidOperationException(
+                $"Could not find SharePoint document library '{_options.LibraryName}'. Available libraries: {availableLibraries}");
+        }
+
+        _logger.LogInformation("Using SharePoint library. Name={DriveName}, Id={DriveId}", drive.Name, drive.Id);
+        return drive;
+    }
+
     private async Task<IReadOnlyList<DriveItem>> GetFilesFromConfiguredLocationAsync(
         string driveId,
         string libraryName,
         string? folderPath,
         CancellationToken ct)
     {
-        DriveItemCollectionResponse? response;
-
-        if (string.IsNullOrWhiteSpace(folderPath))
-        {
-            _logger.LogInformation(
-                "Listing files from root of SharePoint library '{LibraryName}'.",
-                libraryName);
-
-            response = await _graph
-                .Drives[driveId]
-                .Items["root"]
-                .Children
-                .GetAsync(cancellationToken: ct);
-        }
-        else
-        {
-            _logger.LogInformation(
-                "Resolving folder '{FolderPath}' inside SharePoint library '{LibraryName}'.",
-                folderPath,
-                libraryName);
-
-            var folder = await _graph
-                .Drives[driveId]
-                .Items["root"]
-                .ItemWithPath(folderPath)
-                .GetAsync(cancellationToken: ct);
-
-            if (folder?.Id is null)
-            {
-                throw new InvalidOperationException(
-                    $"Could not find folder '{folderPath}' in SharePoint library '{libraryName}'. " +
-                    "FolderPath must be relative to the document-library root.");
-            }
-
-            if (folder.Folder is null)
-            {
-                throw new InvalidOperationException(
-                    $"The path '{folderPath}' exists in SharePoint library '{libraryName}', " +
-                    "but it is a file rather than a folder.");
-            }
-
-            response = await _graph
-                .Drives[driveId]
-                .Items[folder.Id]
-                .Children
-                .GetAsync(cancellationToken: ct);
-        }
+        var response = string.IsNullOrWhiteSpace(folderPath)
+            ? await ListLibraryRootAsync(driveId, libraryName, ct)
+            : await ListFolderAsync(driveId, libraryName, folderPath, ct);
 
         var files = new List<DriveItem>();
 
@@ -276,65 +149,139 @@ public sealed class SharePointDocumentRetriever
                 .GetAsync(cancellationToken: ct);
         }
 
-        _logger.LogInformation(
-            "Found {ItemCount} items in configured SharePoint location.",
-            files.Count);
-
+        _logger.LogInformation("Found {ItemCount} items in configured SharePoint location.", files.Count);
         return files;
     }
 
-    private static bool IsSupportedFile(string fileName)
+    private async Task<DriveItemCollectionResponse?> ListLibraryRootAsync(string driveId, string libraryName, CancellationToken ct)
     {
-        return fileName.EndsWith(".docx", StringComparison.OrdinalIgnoreCase) ||
-               fileName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) ||
-               fileName.EndsWith(".md", StringComparison.OrdinalIgnoreCase);
+        _logger.LogInformation("Listing files from root of SharePoint library '{LibraryName}'.", libraryName);
+
+        return await _graph
+            .Drives[driveId]
+            .Items["root"]
+            .Children
+            .GetAsync(cancellationToken: ct);
     }
 
-    private static async Task<string> ExtractTextAsync(
-        string fileName,
-        Stream stream,
-        CancellationToken ct)
+    private async Task<DriveItemCollectionResponse?> ListFolderAsync(string driveId, string libraryName, string folderPath, CancellationToken ct)
     {
-        if (fileName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) ||
-            fileName.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
-        {
-            using var reader = new StreamReader(stream);
-            return await reader.ReadToEndAsync(ct);
-        }
+        _logger.LogInformation("Resolving folder '{FolderPath}' inside SharePoint library '{LibraryName}'.", folderPath, libraryName);
 
-        if (fileName.EndsWith(".docx", StringComparison.OrdinalIgnoreCase))
-        {
-            await using var memory = new MemoryStream();
+        var folder = await _graph
+            .Drives[driveId]
+            .Items["root"]
+            .ItemWithPath(folderPath)
+            .GetAsync(cancellationToken: ct);
 
-            await stream.CopyToAsync(memory, ct);
-            memory.Position = 0;
-
-            using var wordDocument = WordprocessingDocument.Open(
-                memory,
-                false);
-
-            return wordDocument.MainDocumentPart?
-                .Document?
-                .Body?
-                .InnerText
-                ?.Trim()
-                ?? string.Empty;
-        }
-
-        throw new NotSupportedException(
-            $"Unsupported document type '{Path.GetExtension(fileName)}'.");
-    }
-
-    private string RequireConfig(string key)
-    {
-        var value = _config[key]?.Trim();
-
-        if (string.IsNullOrWhiteSpace(value))
+        if (folder?.Id is null)
         {
             throw new InvalidOperationException(
-                $"Missing required configuration value '{key}'.");
+                $"Could not find folder '{folderPath}' in SharePoint library '{libraryName}'. FolderPath must be relative to the document-library root.");
         }
 
-        return value;
+        if (folder.Folder is null)
+        {
+            throw new InvalidOperationException(
+                $"The path '{folderPath}' exists in SharePoint library '{libraryName}', but it is a file rather than a folder.");
+        }
+
+        return await _graph
+            .Drives[driveId]
+            .Items[folder.Id]
+            .Children
+            .GetAsync(cancellationToken: ct);
+    }
+
+    private bool IsCandidateFile(DriveItem item)
+    {
+        if (item.Id is null || item.Name is null || item.File is null)
+        {
+            return false;
+        }
+
+        if (_textExtractor.CanExtract(item.Name))
+        {
+            return true;
+        }
+
+        _logger.LogDebug("Skipping unsupported file type: {FileName}", item.Name);
+        return false;
+    }
+
+    private async Task<RetrievedDocument?> TryCreateDocumentAsync(
+        DriveItem item,
+        string driveId,
+        string question,
+        CancellationToken ct)
+    {
+        try
+        {
+            var content = await DownloadAndExtractContentAsync(driveId, item, ct);
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                _logger.LogWarning("No readable text was extracted from {FileName}.", item.Name);
+                return null;
+            }
+
+            var score = _scorer.Score(question, content, item.Name!);
+            var suspicious = _scanner.LooksSuspicious(content);
+
+            _logger.LogInformation(
+                "Retrieved {FileName}. Score={Score}, Suspicious={Suspicious}, Characters={Characters}",
+                item.Name,
+                score,
+                suspicious,
+                content.Length);
+
+            return new RetrievedDocument(item.Name!, content, score, suspicious);
+        }
+        catch (ApiException ex)
+        {
+            _logger.LogError(ex, "Graph API failed while processing {FileName} ({ItemId}).", item.Name, item.Id);
+            return null;
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Network failed while processing {FileName} ({ItemId}).", item.Name, item.Id);
+            return null;
+        }
+        catch (IOException ex)
+        {
+            _logger.LogError(ex, "I/O failed while processing {FileName} ({ItemId}).", item.Name, item.Id);
+            return null;
+        }
+        catch (OpenXmlPackageException ex)
+        {
+            _logger.LogError(ex, "DOCX parsing failed for {FileName} ({ItemId}).", item.Name, item.Id);
+            return null;
+        }
+        catch (InvalidDataException ex)
+        {
+            _logger.LogError(ex, "Invalid file data for {FileName} ({ItemId}).", item.Name, item.Id);
+            return null;
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Unexpected document state for {FileName} ({ItemId}).", item.Name, item.Id);
+            return null;
+        }
+    }
+
+    private async Task<string> DownloadAndExtractContentAsync(string driveId, DriveItem item, CancellationToken ct)
+    {
+        await using var stream = await _graph
+            .Drives[driveId]
+            .Items[item.Id!]
+            .Content
+            .GetAsync(cancellationToken: ct);
+
+        if (stream is null)
+        {
+            throw new InvalidOperationException(
+                $"No content stream returned for SharePoint file '{item.Name}' ({item.Id}).");
+        }
+
+        return await _textExtractor.ExtractAsync(item.Name!, stream, ct);
     }
 }

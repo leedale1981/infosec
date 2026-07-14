@@ -1,18 +1,21 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using LD.Ai.Security.Api;
+using Microsoft.Extensions.Options;
 
-public sealed class LocalLlmClient(HttpClient http, IConfiguration config)
+public sealed class LocalLlmClient(HttpClient http, IOptions<OllamaOptions> options)
+    : ITextGenerationClient
 {
     public async Task<string> GenerateAsync(string prompt, CancellationToken ct = default)
     {
-        var baseUrl = config["Ollama:BaseUrl"] ?? "http://localhost:11434";
-        var model = config["Ollama:Model"] ?? "llama3.1";
+        var settings = options.Value;
+        settings.Validate();
 
         var response = await http.PostAsJsonAsync(
-            $"{baseUrl}/api/generate",
+            $"{settings.BaseUrl.TrimEnd('/')}/api/generate",
             new
             {
-                model,
+                model = settings.Model,
                 prompt,
                 stream = false
             },

@@ -1,6 +1,6 @@
 ﻿namespace LD.Ai.Security.Api;
 
-public static class PromptInjectionScanner
+public sealed class PhrasePromptInjectionScanner : IPromptInjectionScanner
 {
     private static readonly string[] SuspiciousPhrases =
     [
@@ -20,7 +20,7 @@ public static class PromptInjectionScanner
         "annual leave has been cancelled"
     ];
 
-    public static bool LooksSuspicious(string text)
+    public bool LooksSuspicious(string text)
     {
         return SuspiciousPhrases.Any(phrase =>
             text.Contains(phrase, StringComparison.OrdinalIgnoreCase));
