@@ -1,0 +1,30 @@
+build/
+*.o
+*.a
+*.so
+AnalysisAI
+.DS_Store
+*.swp
+*~
+.vscode/
+.idea/
+tags
+TAGS
+Session.vim
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Gcov coverage
+*.gcov
+*.gcda
+*.gcno
+
+# Valgrind
+vgcore.*
+
+# Session directories (GUID-based)
+[a-f0-9][a-f0-9]*-[a-f0-9][a-f0-9]*-[a-f0-9][a-f0-9]*-[a-f0-9][a-f0-9]*-[a-f0-9][a-f0-9]*/

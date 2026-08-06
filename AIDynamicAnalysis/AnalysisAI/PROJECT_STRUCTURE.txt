@@ -1,0 +1,208 @@
+AnalysisAI C Console Application
+=================================
+
+Project Directory Structure
+---------------------------
+
+AnalysisAI/
+├── src/                          # Source code directory
+│   ├── main.c                    # Main entry point with CLI argument parsing
+│   ├── analysis.h                # Analysis module header
+│   ├── analysis.c                # Binary analysis - ltrace execution
+│   ├── ai_client.h               # AI client module header
+│   ├── ai_client.c               # AI API integration (OpenAI, Claude, Copilot)
+│   ├── vulnerability_analyzer.h  # Vulnerability analysis header
+│   └── vulnerability_analyzer.c  # Vulnerability report generation and parsing
+│
+├── Makefile                      # Build configuration for Linux
+├── .editorconfig                 # Code style and formatting rules
+├── .gitignore                    # Git ignore patterns
+├── README.md                     # Complete project documentation
+├── CHANGELOG.md                  # Version history and changes
+├── CONTRIBUTING.md              # Contribution guidelines
+├── setup.sh                      # Quick start installation script
+└── PROJECT_STRUCTURE.txt         # This file
+
+
+Key Features Implemented
+------------------------
+
+✓ CLI Argument Parsing
+  - Binary path (-b, --binary)
+  - AI model type (-m, --model): openai, claude, copilot
+  - API key (-k, --key)
+  - Help display (-h, --help)
+
+✓ Binary Analysis Engine
+  - ltrace library call capture
+  - ltrace system call capture (-S flag)
+  - Session directory creation with GUID
+  - Output file management
+
+✓ AI Integration
+  - OpenAI GPT-4 support
+  - Anthropic Claude 3 support
+  - Copilot (OpenAI) support
+  - JSON request/response handling
+  - Automatic model configuration
+
+✓ Vulnerability Analysis
+  - Prompt generation from ltrace output
+  - Source/sink identification
+  - Risk assessment and grading
+  - Report generation (markdown format)
+
+✓ Output and Reporting
+  - Console summary with ASCII art
+  - Markdown report generation
+  - Structured session directories
+  - Risk profiling (Low/Medium/High/Critical)
+  - Letter grades (A-F)
+
+
+Build and Deployment
+--------------------
+
+Requirements:
+  - gcc (C11 compiler)
+  - Build tools (make)
+  - libuuid-dev
+  - libcurl4-openssl-dev
+  - libcjson-dev
+  - ltrace
+
+Quick Installation:
+  cd AnalysisAI
+  chmod +x setup.sh
+  ./setup.sh
+
+Manual Build:
+  make install-deps
+  make
+  make clean     # Clean build artifacts
+
+
+Usage Examples
+--------------
+
+Analyze with OpenAI:
+  ./AnalysisAI -b /usr/bin/curl -m openai -k sk-...
+
+Analyze with Claude:
+  ./AnalysisAI -b /bin/ls -m claude -k sk-ant-...
+
+Show help:
+  ./AnalysisAI -h
+
+
+Output Structure
+----------------
+
+Each analysis creates a directory named by UUID:
+
+<uuid>/
+├── ltrace_libs.txt       # Library function call traces
+├── ltrace_syscalls.txt   # System call traces
+└── summary.md            # Generated security report
+
+
+API Integration
+---------------
+
+OpenAI (GPT-4):
+  - Endpoint: https://api.openai.com/v1/chat/completions
+  - Model: gpt-4
+  - Auth: Bearer token
+
+Claude (Anthropic):
+  - Endpoint: https://api.anthropic.com/v1/messages
+  - Model: claude-3-opus-20240229
+  - Auth: API key header
+
+Copilot:
+  - Uses OpenAI endpoints
+  - Model: gpt-4-turbo
+
+
+Code Organization
+-----------------
+
+main.c                  - CLI handler, orchestration
+analysis.c/h            - ltrace execution and session management
+ai_client.c/h           - Multi-API AI client implementation
+vulnerability_analyzer.c/h - Report generation and parsing
+
+Security Considerations:
+  - API keys handled securely
+  - No keys stored in logs
+  - Session-based output isolation
+  - Input validation on binary paths
+
+
+Development Notes
+-----------------
+
+- Uses POSIX C11 standard for portability
+- libcurl for HTTP/HTTPS API calls
+- libcjson for JSON parsing
+- libuuid for unique session identification
+- No external bash scripts required (pure C)
+
+
+Testing Recommendations
+-----------------------
+
+1. Test with standard Linux utilities:
+   ./AnalysisAI -b /bin/ls -m openai -k $KEY
+   ./AnalysisAI -b /usr/bin/wget -m claude -k $KEY
+   ./AnalysisAI -b /bin/dash -m copilot -k $KEY
+
+2. Verify session directory creation:
+   ls -la | grep "^d" | head -n 5
+
+3. Check generated reports:
+   cat <uuid>/summary.md
+
+4. Verify ltrace output capture:
+   cat <uuid>/ltrace_libs.txt
+   cat <uuid>/ltrace_syscalls.txt
+
+
+Troubleshooting
+---------------
+
+Build Errors:
+  - Run: make install-deps (requires sudo)
+  - Ensure all dev packages installed
+  - Check gcc version: gcc --version
+
+Runtime Errors:
+  - ltrace not found: install ltrace package
+  - API errors: verify API keys and network
+  - Binary not found: use absolute paths
+
+Permission Issues:
+  - Make binary executable: chmod +x <binary>
+  - Session dir permissions: created with 0755
+
+
+Future Enhancements
+-------------------
+
+- Windows/macOS support
+- Strace integration
+- Custom analysis rules
+- Database backend
+- Web UI
+- Batch analysis
+- ML-based classification
+- Caching system
+
+
+Author
+------
+
+AnalysisAI Development Team
+
+For documentation, see README.md
+For contribution guidelines, see CONTRIBUTING.md
