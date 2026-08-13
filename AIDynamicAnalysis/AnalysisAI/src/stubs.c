@@ -1,4 +1,5 @@
-// Stub implementations for testing refactored main.c structure
+// Stub implementations for testing refactored main.c structure.
+// Includes the real headers so the stub ABI always matches production.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,16 +7,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-// ========== ANALYSIS STUBS ==========
+#include "analysis.h"
+#include "ai_client.h"
+#include "vulnerability_analyzer.h"
 
-typedef struct
-{
-    char *guid;
-    char *session_dir;
-    char *binary_path;
-    char *ltrace_libs_output;
-    char *ltrace_syscalls_output;
-} AnalysisSession;
+// ========== ANALYSIS STUBS ==========
 
 AnalysisSession *analysis_create_session(const char *binary_path)
 {
@@ -46,16 +42,51 @@ AnalysisSession *analysis_create_session(const char *binary_path)
     session->ltrace_syscalls_output = malloc(1024);
     strcpy(session->ltrace_syscalls_output, "[ltrace system calls would be here]\n");
 
+    session->chosen_input = NULL;
+
     return session;
 }
 
-int analysis_run_ltrace_libs(AnalysisSession *session)
+int analysis_run_ltrace_libs(AnalysisSession *session, const char *target_args)
 {
+    (void)session;
+    (void)target_args;
     return 0;
 }
 
-int analysis_run_ltrace_syscalls(AnalysisSession *session)
+int analysis_run_ltrace_syscalls(AnalysisSession *session, const char *target_args)
 {
+    (void)session;
+    (void)target_args;
+    return 0;
+}
+
+CoverageInfo analysis_assess_coverage(const char *libs_output,
+                                      const char *syscalls_output)
+{
+    (void)libs_output;
+    (void)syscalls_output;
+    CoverageInfo info;
+    info.level = COVERAGE_SHALLOW;
+    info.lib_call_count = 1;
+    strcpy(info.sink_hit, "");
+    return info;
+}
+
+int analysis_drive_binary(AnalysisSession *session, const char *user_args,
+                          CoverageInfo *out_cov, int *out_attempts)
+{
+    free(session->chosen_input);
+    session->chosen_input = strdup(user_args ? user_args : "(stub input)");
+    if (out_cov != NULL)
+    {
+        *out_cov = analysis_assess_coverage(session->ltrace_libs_output,
+                                            session->ltrace_syscalls_output);
+    }
+    if (out_attempts != NULL)
+    {
+        *out_attempts = 1;
+    }
     return 0;
 }
 
@@ -68,26 +99,11 @@ void analysis_free_session(AnalysisSession *session)
     free(session->binary_path);
     free(session->ltrace_libs_output);
     free(session->ltrace_syscalls_output);
+    free(session->chosen_input);
     free(session);
 }
 
 // ========== AI CLIENT STUBS ==========
-
-typedef enum
-{
-    AI_MODEL_OPENAI,
-    AI_MODEL_CLAUDE,
-    AI_MODEL_COPILOT,
-    AI_MODEL_UNKNOWN
-} AIModelType;
-
-typedef struct
-{
-    AIModelType model_type;
-    char *api_key;
-    char *model_name;
-    char *endpoint;
-} AIClient;
 
 AIModelType ai_parse_model_type(const char *model_str)
 {
@@ -145,6 +161,8 @@ AIClient *ai_create_client(AIModelType model_type, const char *api_key)
 
 char *ai_analyze_vulnerabilities(AIClient *client, const char *prompt)
 {
+    (void)client;
+    (void)prompt;
     char *response = malloc(512);
     strcpy(response, "{\"risk_level\": \"medium\", \"grade\": \"B\", \"sources\": [], \"sinks\": []}");
     return response;
@@ -162,39 +180,46 @@ void ai_free_client(AIClient *client)
 
 // ========== VULNERABILITY ANALYZER STUBS ==========
 
-typedef enum
-{
-    RISK_LOW,
-    RISK_MEDIUM,
-    RISK_HIGH,
-    RISK_CRITICAL
-} RiskLevel;
-
-typedef struct
-{
-    RiskLevel risk_level;
-    char *grade;
-    char *summary;
-    char *detailed_findings;
-    int vulnerability_count;
-    char *potential_sources[50];
-    char *potential_sinks[50];
-} VulnerabilityReport;
-
 char *vulnerability_create_prompt(const char *binary_name,
                                    const char *libs_output,
-                                   const char *syscalls_output)
+                                   const char *syscalls_output,
+                                   const char *coverage_note)
 {
-    char *prompt = malloc(1024);
-    snprintf(prompt, 1024,
-             "Analyze binary %s for vulnerabilities\nLibrary calls: %s\nSystem calls: %s",
-             binary_name, libs_output, syscalls_output);
+    char *prompt = malloc(2048);
+    snprintf(prompt, 2048,
+             "Analyze binary %s for vulnerabilities\nCoverage: %s\nLibrary calls: %s\nSystem calls: %s",
+             binary_name, coverage_note ? coverage_note : "n/a", libs_output, syscalls_output);
     return prompt;
+}
+
+VulnerabilityReport *vulnerability_create_inconclusive(const char *binary_name,
+                                                        const char *coverage_note)
+{
+    (void)binary_name;
+    VulnerabilityReport *report = malloc(sizeof(VulnerabilityReport));
+    report->risk_level = RISK_LOW;
+    report->grade = malloc(8);
+    strcpy(report->grade, "N/A");
+    report->summary = NULL;
+    report->detailed_findings = malloc(256);
+    strcpy(report->detailed_findings, "INCONCLUSIVE (stub): no coverage.");
+    report->vulnerability_count = 0;
+    report->inconclusive = 1;
+    report->coverage_note = coverage_note ? strdup(coverage_note) : NULL;
+
+    for (int i = 0; i < 50; i++)
+    {
+        report->potential_sources[i] = NULL;
+        report->potential_sinks[i] = NULL;
+    }
+
+    return report;
 }
 
 VulnerabilityReport *vulnerability_parse_response(const char *ai_response,
                                                     const char *binary_name)
 {
+    (void)binary_name;
     VulnerabilityReport *report = malloc(sizeof(VulnerabilityReport));
     report->risk_level = RISK_MEDIUM;
     report->grade = malloc(32);
@@ -204,6 +229,8 @@ VulnerabilityReport *vulnerability_parse_response(const char *ai_response,
     report->detailed_findings = malloc(strlen(ai_response) + 1);
     strcpy(report->detailed_findings, ai_response);
     report->vulnerability_count = 0;
+    report->inconclusive = 0;
+    report->coverage_note = NULL;
 
     for (int i = 0; i < 50; i++)
     {
@@ -223,15 +250,14 @@ char *vulnerability_generate_summary(VulnerabilityReport *report)
              "╚════════════════════════════════════════════════════════════╝\n\n"
              "SECURITY RISK PROFILE\n"
              "━━━━━━━━━━━━━━━━━━━━━━\n"
-             "Risk Level: MEDIUM\n"
-             "Security Grade: %s\n\n"
-             "IDENTIFIED ISSUES\n"
-             "━━━━━━━━━━━━━━━━━━\n"
-             "Potential Input Sources: None detected\n"
-             "Dangerous Operations: None detected\n\n"
+             "%sSecurity Grade: %s\n"
+             "Coverage: %s\n\n"
              "ANALYSIS DETAILS\n"
              "━━━━━━━━━━━━━━━━\n%s\n",
-             report->grade, report->detailed_findings);
+             report->inconclusive ? "Result: INCONCLUSIVE\n" : "Risk Level: MEDIUM\n",
+             report->grade,
+             report->coverage_note ? report->coverage_note : "n/a",
+             report->detailed_findings);
     return summary;
 }
 
@@ -246,8 +272,15 @@ int vulnerability_write_report(VulnerabilityReport *report, const char *output_p
 
     fprintf(file, "# Security Vulnerability Analysis Report\n\n");
     fprintf(file, "## Risk Assessment\n\n");
-    fprintf(file, "**Risk Level:** `MEDIUM`\n\n");
+    if (report->inconclusive)
+    {
+        fprintf(file, "> INCONCLUSIVE - no execution coverage.\n\n");
+    }
     fprintf(file, "**Security Grade:** `%s`\n\n", report->grade);
+    if (report->coverage_note)
+    {
+        fprintf(file, "**Execution Coverage:** %s\n\n", report->coverage_note);
+    }
     fprintf(file, "## Detailed Analysis\n\n%s\n", report->detailed_findings);
     fprintf(file, "\n---\n*Report generated by AnalysisAI*\n");
 
@@ -262,6 +295,7 @@ void vulnerability_free_report(VulnerabilityReport *report)
     free(report->grade);
     free(report->summary);
     free(report->detailed_findings);
+    free(report->coverage_note);
 
     for (int i = 0; i < 50; i++)
     {

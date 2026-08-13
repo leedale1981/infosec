@@ -1,5 +1,7 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -O2 -std=c11
+# _GNU_SOURCE is required for strcasestr()/strcasecmp(); without it they are
+# implicitly declared as returning int, which truncates the pointer on 64-bit
+CFLAGS = -Wall -Wextra -O2 -std=gnu11 -D_GNU_SOURCE
 LDFLAGS = -luuid -lcurl -lcjson
 
 # Directories
@@ -8,7 +10,9 @@ BUILD_DIR = build
 BIN_DIR = .
 
 # Source and object files
-SOURCES = $(wildcard $(SRC_DIR)/*.c)
+# stubs.c is the mock implementation used only by Makefile.quick - including it
+# here duplicates every symbol in ai_client.c/analysis.c/vulnerability_analyzer.c
+SOURCES = $(filter-out $(SRC_DIR)/stubs.c,$(wildcard $(SRC_DIR)/*.c))
 OBJECTS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SOURCES))
 TARGET = $(BIN_DIR)/AnalysisAI
 
@@ -26,7 +30,7 @@ $(TARGET): $(OBJECTS)
 	@echo "✓ Build complete: $@"
 
 # Compile source files
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	@echo "Compiling $<..."
 	@$(CC) $(CFLAGS) -c $< -o $@
 

@@ -12,9 +12,13 @@ typedef struct
     char *binary_path;
     char *model_type_str;
     char *api_key;
+    char *target_args;          // Explicit target arguments (--args), or NULL to fuzz
     AnalysisSession *session;
     AIClient *ai_client;
     VulnerabilityReport *report;
+    CoverageInfo coverage;      // Coverage of the retained traces
+    int fuzz_attempts;          // Number of inputs tried while driving the target
+    char coverage_note[512];    // Human-readable coverage note for prompt/report
 } AppContext;
 
 // ASCII Art Banner
@@ -46,10 +50,14 @@ static void print_usage(const char *program_name)
     printf("  -m, --model <type>      AI model type (openai, claude, copilot)\n");
     printf("  -k, --key <api_key>     API key for the selected AI model\n\n");
     printf("Optional Arguments:\n");
+    printf("  -a, --args <args>       Arguments to pass to the target binary when tracing.\n");
+    printf("                          If omitted, the target is fuzzed with well-known\n");
+    printf("                          payloads until a live/vulnerable code path is found.\n");
     printf("  -h, --help              Display this help message\n\n");
     printf("Example:\n");
     printf("  %s -b /path/to/binary -m openai -k sk-...\n", program_name);
-    printf("  %s -b /usr/bin/curl -m claude -k sk-ant-...\n\n", program_name);
+    printf("  %s -b ./vuln -m claude -k sk-ant-... -a \"hello world\"\n", program_name);
+    printf("  %s -b ./vuln -m claude -k sk-ant-...   (no -a: auto-fuzz)\n\n", program_name);
 }
 
 /// <summary>
@@ -65,6 +73,7 @@ static int parse_command_line_arguments(int argc, char *argv[], AppContext *ctx)
         {"binary", required_argument, 0, 'b'},
         {"model", required_argument, 0, 'm'},
         {"key", required_argument, 0, 'k'},
+        {"args", required_argument, 0, 'a'},
         {"help", no_argument, 0, 'h'},
         {0, 0, 0, 0}
     };
@@ -72,7 +81,7 @@ static int parse_command_line_arguments(int argc, char *argv[], AppContext *ctx)
     int opt;
     int option_index = 0;
 
-    while ((opt = getopt_long(argc, argv, "b:m:k:h", long_options, &option_index)) != -1)
+    while ((opt = getopt_long(argc, argv, "b:m:k:a:h", long_options, &option_index)) != -1)
     {
         switch (opt)
         {
@@ -84,6 +93,9 @@ static int parse_command_line_arguments(int argc, char *argv[], AppContext *ctx)
             break;
         case 'k':
             ctx->api_key = optarg;
+            break;
+        case 'a':
+            ctx->target_args = optarg;
             break;
         case 'h':
             print_usage(argv[0]);
@@ -139,21 +151,54 @@ static int run_binary_analysis(AppContext *ctx)
     printf("[✓] Session created: %s\n", ctx->session->guid);
     printf("[*] Session directory: %s\n\n", ctx->session->session_dir);
 
-    // Run ltrace for library calls
-    printf("[*] Executing ltrace (library calls)...\n");
-    if (analysis_run_ltrace_libs(ctx->session) != 0)
+    // Drive the target to obtain a meaningful trace: either with the supplied
+    // --args, or by fuzzing until a live/vulnerable code path is reached.
+    if (ctx->target_args != NULL)
     {
-        fprintf(stderr, "Warning: ltrace library analysis completed with status\n");
+        printf("[*] Tracing target with supplied arguments: %s\n", ctx->target_args);
     }
-    printf("[✓] Library calls captured\n\n");
+    else
+    {
+        printf("[*] No --args supplied; fuzzing target to find a live code path...\n");
+    }
 
-    // Run ltrace for system calls
-    printf("[*] Executing ltrace (system calls)...\n");
-    if (analysis_run_ltrace_syscalls(ctx->session) != 0)
+    if (analysis_drive_binary(ctx->session, ctx->target_args,
+                              &ctx->coverage, &ctx->fuzz_attempts) != 0)
     {
-        fprintf(stderr, "Warning: ltrace syscalls analysis completed with status\n");
+        fprintf(stderr, "Warning: binary analysis completed with status\n");
     }
-    printf("[✓] System calls captured\n\n");
+
+    // Compose a human-readable coverage note used in the prompt and the report.
+    const char *input = (ctx->session->chosen_input != NULL)
+                            ? ctx->session->chosen_input
+                            : "(unknown)";
+    switch (ctx->coverage.level)
+    {
+    case COVERAGE_SINK:
+        snprintf(ctx->coverage_note, sizeof(ctx->coverage_note),
+                 "Reached a dangerous operation ('%s') after %d input(s). "
+                 "Triggering input: %s. Library calls observed: %d.",
+                 ctx->coverage.sink_hit, ctx->fuzz_attempts, input,
+                 ctx->coverage.lib_call_count);
+        break;
+    case COVERAGE_SHALLOW:
+        snprintf(ctx->coverage_note, sizeof(ctx->coverage_note),
+                 "Target executed (%d library calls) but no dangerous sink was reached "
+                 "across %d input(s). Input used: %s.",
+                 ctx->coverage.lib_call_count, ctx->fuzz_attempts, input);
+        break;
+    case COVERAGE_NONE:
+    default:
+        snprintf(ctx->coverage_note, sizeof(ctx->coverage_note),
+                 "No library calls were captured across %d input(s) - the target "
+                 "returned or exited during startup without executing its own logic. "
+                 "Last input tried: %s.",
+                 ctx->fuzz_attempts, input);
+        break;
+    }
+
+    printf("[✓] Trace captured (%s)\n", ctx->coverage_note);
+    printf("\n");
 
     return 0;
 }
@@ -205,11 +250,28 @@ static int perform_vulnerability_analysis(AppContext *ctx)
 {
     char *binary_name = extract_binary_name(ctx->binary_path);
 
+    // If nothing of the target actually executed, do not ask the AI to judge an
+    // empty trace (which yields a misleading "clean / grade A"). Report the run
+    // as INCONCLUSIVE instead.
+    if (ctx->coverage.level == COVERAGE_NONE)
+    {
+        printf("[!] No execution coverage obtained - marking analysis INCONCLUSIVE.\n");
+        printf("    %s\n\n", ctx->coverage_note);
+        ctx->report = vulnerability_create_inconclusive(binary_name, ctx->coverage_note);
+        if (ctx->report == NULL)
+        {
+            fprintf(stderr, "Fatal Error: Failed to create inconclusive report\n");
+            return 1;
+        }
+        return 0;
+    }
+
     // Create analysis prompt
     printf("[*] Generating analysis prompt...\n");
     char *prompt = vulnerability_create_prompt(binary_name,
                                                 ctx->session->ltrace_libs_output,
-                                                ctx->session->ltrace_syscalls_output);
+                                                ctx->session->ltrace_syscalls_output,
+                                                ctx->coverage_note);
     if (prompt == NULL)
     {
         fprintf(stderr, "Fatal Error: Failed to create analysis prompt\n");
@@ -238,6 +300,11 @@ static int perform_vulnerability_analysis(AppContext *ctx)
     if (ctx->report == NULL)
     {
         fprintf(stderr, "Warning: Could not parse AI response as JSON\n");
+    }
+    else
+    {
+        // Carry the observed coverage into the report for transparency.
+        ctx->report->coverage_note = strdup(ctx->coverage_note);
     }
     printf("[✓] Report generated\n\n");
 
@@ -334,11 +401,15 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // Setup AI client with model type and API key
-    if (setup_ai_client(&ctx) != 0)
+    // Setup AI client with model type and API key. Skipped when the target
+    // produced no coverage - there is nothing for the AI to analyze.
+    if (ctx.coverage.level != COVERAGE_NONE)
     {
-        cleanup_resources(&ctx);
-        return 1;
+        if (setup_ai_client(&ctx) != 0)
+        {
+            cleanup_resources(&ctx);
+            return 1;
+        }
     }
 
     // Perform vulnerability analysis

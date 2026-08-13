@@ -14,8 +14,10 @@ typedef struct
 } ResponseBuffer;
 
 // Callback for curl to write response data
-static size_t curl_write_callback(void *contents, size_t size, size_t nmemb, ResponseBuffer *userp)
+// Signature must match libcurl's curl_write_callback typedef exactly
+static size_t response_write_callback(char *contents, size_t size, size_t nmemb, void *userdata)
 {
+    ResponseBuffer *userp = (ResponseBuffer *)userdata;
     size_t realsize = size * nmemb;
     char *ptr = realloc(userp->data, userp->size + realsize + 1);
 
@@ -118,7 +120,7 @@ AIClient *ai_create_client(AIModelType model_type, const char *api_key)
         break;
 
     case AI_MODEL_CLAUDE:
-        client->model_name = malloc(16);
+        client->model_name = malloc(32);
         strcpy(client->model_name, "claude-3-opus-20240229");
         client->endpoint = malloc(64);
         strcpy(client->endpoint, "https://api.anthropic.com/v1/messages");
@@ -179,7 +181,7 @@ static char *ai_call_openai(AIClient *client, const char *prompt)
     curl_easy_setopt(curl, CURLOPT_URL, client->endpoint);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_str);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, response_write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&response);
 
     // Execute request
@@ -261,7 +263,7 @@ static char *ai_call_claude(AIClient *client, const char *prompt)
     curl_easy_setopt(curl, CURLOPT_URL, client->endpoint);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_str);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, response_write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&response);
 
     CURLcode res = curl_easy_perform(curl);
