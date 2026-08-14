@@ -18,6 +18,7 @@ This repository is organized by information security domain. Each section contai
 
 ```
 infosec/
+├── 🤖 AIDynamicAnalysis/   — AI-assisted dynamic binary analysis
 ├── 🌐 WebSecurity/         — Web application security & API reconnaissance
 ├── 🔌 NetworkSecurity/     — Network testing & packet-level tooling
 ├── 💥 Exploits/            — Memory corruption & code vulnerability research
@@ -77,6 +78,16 @@ Reference notes and techniques for web application reconnaissance including Burp
 ### 🧠 [Indirect Prompt Injection in RAG (SharePoint + Ollama)](https://github.com/leedale1981/infosec/tree/master/AISecurity)
 
 A short end-to-end demo showing how a single malicious document in a SharePoint policy library can poison retrieved context and influence a local Ollama model to return incorrect company policy answers, plus hardened/scanned mitigation paths.
+
+---
+
+## 🔍 AI-Assisted Dynamic Analysis
+
+> Runtime binary analysis that combines execution tracing, automated path discovery, and AI-assisted vulnerability review.
+
+### 🧠 [AnalysisAI — Dynamic Binary Vulnerability Analyzer](https://github.com/leedale1981/infosec/tree/master/AIDynamicAnalysis)
+
+AnalysisAI is a Linux console tool that runs a target binary under `ltrace`, captures its library and system calls, and submits the observed behavior to OpenAI, Claude, or Copilot for review. It can exercise specific paths with supplied arguments or fuzz the target automatically, then produces a risk level, security grade, and Markdown report while flagging runs with insufficient coverage as inconclusive.
 
 ---
 
